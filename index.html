@@ -4,73 +4,115 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Каталог с эффектом стекла</title>
+
 <style>
+/* ===== ОБЩИЙ ФОН С КАРТИНКОЙ ===== */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
-  background: linear-gradient(135deg, #1a1a1a, #121212);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(20,20,20,0.85),
+      rgba(10,10,10,0.85)
+    ),
+    url("https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
   min-height: 100vh;
   padding: 24px;
   box-sizing: border-box;
 }
 
+/* ===== ЗАГОЛОВОК ===== */
+h1 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 32px;
+  font-weight: 600;
+}
+
+/* ===== КАТАЛОГ ===== */
 .catalog {
   max-width: 1200px;
   margin: auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  gap: 24px;
 }
 
-/* Эффект жидкого стекла для карточек */
+/* ===== СТЕКЛЯННЫЕ КАРТОЧКИ ===== */
 .card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-radius: 18px;
   padding: 16px;
+
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+
+  color: #fff;
   display: flex;
   flex-direction: column;
-  color: #ffffff;
-  border: 1px solid rgba(255,255,255,0.2);
-  transition: transform 0.2s;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
+  box-shadow:
+    0 14px 40px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.25);
 }
 
+/* ===== КАРТИНКА ===== */
 .card img {
-  width: 100%;  /* по умолчанию адаптивная ширина */
-  height: auto; /* по умолчанию адаптивная высота */
+  width: 100%;
+  height: 180px;
   object-fit: cover;
   border-radius: 12px;
 }
 
+/* ===== ТЕКСТ ===== */
 .card h3 {
-  margin: 12px 0 6px;
+  margin: 14px 0 8px;
   font-size: 18px;
-  color: #ffffff;
+  font-weight: 600;
 }
 
 .card p {
   font-size: 14px;
-  color: #ffffff;
+  opacity: 0.9;
+  line-height: 1.4;
   flex: 1;
 }
 
+/* ===== ЦЕНА ===== */
 .price {
+  margin-top: 12px;
   font-size: 20px;
   font-weight: 700;
-  margin-top: 10px;
-  color: #ffffff;
+}
+
+/* ===== АДАПТИВ ===== */
+@media (max-width: 480px) {
+  .card img {
+    height: 150px;
+  }
 }
 </style>
 </head>
+
 <body>
 
-<h1 style="color:white; text-align:center; margin-bottom:24px;">Каталог товаров</h1>
+<h1>Каталог товаров</h1>
 
 <div class="catalog" id="catalog"></div>
 
@@ -78,23 +120,26 @@ body {
 const DATA_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
 
 fetch(DATA_URL)
-  .then(r => r.json())
+  .then(res => res.json())
   .then(items => {
-    const wrap = document.getElementById("catalog");
-    items.forEach(i => {
-      // Берём размеры из таблицы, если пусто — адаптивные
-      const width = i.width ? i.width : '100%';
-      const height = i.height ? i.height : 'auto';
-      
-      wrap.innerHTML += `
+    const catalog = document.getElementById("catalog");
+
+    items.forEach(item => {
+      catalog.insertAdjacentHTML("beforeend", `
         <div class="card">
-          <img src="${i.image}" style="width:${width};height:${height};" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
-          <h3>${i.name}</h3>
-          <p>${i.description}</p>
-          <div class="price">${i.price} ${i.currency}</div>
+          <img src="${item.image}" 
+               onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+          <h3>${item.name}</h3>
+          <p>${item.description}</p>
+          <div class="price">${item.price} ${item.currency}</div>
         </div>
-      `;
+      `);
     });
+  })
+  .catch(err => {
+    document.getElementById("catalog").innerHTML =
+      "<p style='color:white'>Ошибка загрузки данных</p>";
+    console.error(err);
   });
 </script>
 
