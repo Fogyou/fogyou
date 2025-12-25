@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<link rel="icon" type="image/png" href="favicon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AmmuNation</title>
+
 <style>
 /* ===== ОБЩИЙ ФОН ===== */
 body {
@@ -13,23 +21,6 @@ body {
   min-height: 100svh;
   padding: 24px;
   box-sizing: border-box;
-}
-
-/* ===== FIX ДЛЯ SAFARI ===== */
-@supports (-webkit-backdrop-filter: blur(0)) {
-  body {
-    -webkit-transform: translate3d(0,0,0);
-    transform: translate3d(0,0,0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-perspective: 1000;
-    perspective: 1000;
-  }
-
-  .card, .info-box {
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
 }
 
 /* ===== ЗАГОЛОВОК ===== */
@@ -156,3 +147,48 @@ h1 {
   .card img { height: 150px; }
 }
 </style>
+</head>
+
+<body>
+
+<h1>AmmuNation</h1>
+
+<div class="main-layout">
+
+  <!-- ===== КАТАЛОГ ===== -->
+  <div class="catalog" id="catalog"></div>
+
+  <!-- ===== ИНФО СПРАВА ===== -->
+  <aside class="info-box">
+    <h2>Наши контакты</h2>
+    <p><strong>Dist. 8168</strong></p>
+    <p>Алекс — (520) 331-9666</p>
+    <p>Зик — (205) 195-0992</p>
+    <p>Нолан — (480) 067-5061</p>
+  </aside>
+
+</div>
+
+<script>
+const DATA_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
+
+fetch(DATA_URL)
+  .then(res => res.json())
+  .then(items => {
+    const catalog = document.getElementById("catalog");
+    items.forEach(item => {
+      catalog.insertAdjacentHTML("beforeend", `
+        <div class="card">
+          <img src="${item.image}" 
+               onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+          <h3>${item.name}</h3>
+          <p>${item.description}</p>
+          <div class="price">${item.price} ${item.currency}</div>
+        </div>
+      `);
+    });
+  });
+</script>
+
+</body>
+</html>
