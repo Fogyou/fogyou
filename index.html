@@ -35,16 +35,14 @@ h1 {
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 24px;
-  align-items: start;
 }
 
 .info-box {
   padding: 20px 22px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.12);
   backdrop-filter: blur(16px) saturate(140%);
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.25);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
   color: #fff;
 }
 
@@ -52,17 +50,11 @@ h1 {
   margin-top: 16px;
 }
 
-.info-box h2 {
-  margin: 0 0 12px;
-  font-size: 20px;
-}
-
 .order-btn {
   display: block;
   margin-top: 14px;
   padding: 12px;
   text-align: center;
-  font-size: 16px;
   font-weight: 600;
   color: #fff;
   background: #000;
@@ -71,24 +63,58 @@ h1 {
 }
 
 .catalog {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
+  display: block;
 }
 
 /* Категория */
 .category {
-  grid-column: 1 / -1;
-  margin: 32px 0 8px;
-  font-size: 26px;
-  font-weight: 700;
-  color: #fff;
-  border-bottom: 2px solid rgba(255,255,255,0.25);
-  padding-bottom: 8px;
+  margin-bottom: 24px;
 }
 
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.14);
+  border-radius: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  user-select: none;
+}
+
+.category-header:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+.category.collapsed .arrow {
+  transform: rotate(-90deg);
+}
+
+.category-content {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.category.collapsed .category-content {
+  max-height: 0;
+  padding: 0;
+  gap: 0;
+}
+
+/* Карточка */
 .card {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.12);
   backdrop-filter: blur(16px) saturate(140%);
   border-radius: 18px;
   padding: 16px;
@@ -104,15 +130,16 @@ h1 {
 }
 
 .card img {
-  max-width: 100%;
+  width: 100%;
   height: auto;
   object-fit: contain;
   border-radius: 12px;
-  margin: auto;
+  display: block;
+  margin: 0 auto 12px;
 }
 
 .card h3 {
-  margin: 14px 0 8px;
+  margin: 8px 0;
   font-size: 18px;
 }
 
@@ -151,65 +178,3 @@ h1 {
       <p>Зик — (205) 195-0992</p>
       <p>Нолан — (480) 067-5061</p>
     </div>
-
-    <div class="info-box">
-      <h2>Заказать</h2>
-      <p>Оформите заказ онлайн</p>
-      <a class="order-btn"
-         href="https://docs.google.com/forms/u/0/d/e/1FAIpQLSdmvr1ac4_uTulR9OMTrDgA_a9oZg3t0fm2w-8xqqSkLRAlwA/formResponse"
-         target="_blank">
-         Заказать
-      </a>
-    </div>
-  </aside>
-
-</div>
-
-<script>
-const DATA_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
-
-fetch(DATA_URL)
-  .then(res => res.json())
-  .then(items => {
-
-    const catalog = document.getElementById("catalog");
-    const categories = {};
-
-    // Группируем товары
-    items.forEach(item => {
-      const category = item.category?.trim() || "Без категории";
-      if (!categories[category]) categories[category] = [];
-      categories[category].push(item);
-    });
-
-    // Вывод
-    for (const categoryName in categories) {
-
-      catalog.insertAdjacentHTML("beforeend", `
-        <div class="category">${categoryName}</div>
-      `);
-
-      categories[categoryName].forEach(item => {
-
-        const styleW = item.width ? `max-width:${item.width}px;` : "";
-        const styleH = item.height ? `max-height:${item.height}px;` : "";
-
-        catalog.insertAdjacentHTML("beforeend", `
-          <div class="card">
-            <img
-              src="${item.image}"
-              style="${styleW}${styleH}"
-              onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'"
-            >
-            <h3>${item.name}</h3>
-            <p>${item.description}</p>
-            <div class="price">${item.price} ${item.currency}</div>
-          </div>
-        `);
-      });
-    }
-  });
-</script>
-
-</body>
-</html>
