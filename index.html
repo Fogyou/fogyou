@@ -6,24 +6,17 @@
 <title>Каталог с эффектом стекла</title>
 
 <style>
-/* ===== ОБЩИЙ ФОН С КАРТИНКОЙ ===== */
+/* ===== ОБЩИЙ ФОН ===== */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
-
   background:
-    linear-gradient(
-      135deg,
-      rgba(20,20,20,0.85),
-      rgba(10,10,10,0.85)
-    ),
-    url("https://i.imgur.com/SCMy3Xr.jpeg");
-
+    linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)),
+    url("https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-
   min-height: 100vh;
   padding: 24px;
   box-sizing: border-box;
@@ -37,10 +30,49 @@ h1 {
   font-weight: 600;
 }
 
+/* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
+.main-layout {
+  max-width: 1400px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ===== ИНФО-БЛОК СПРАВА ===== */
+.info-box {
+  padding: 20px 22px;
+
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+
+  color: #fff;
+  position: sticky;
+  top: 24px;
+}
+
+.info-box h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.info-box p {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 /* ===== КАТАЛОГ ===== */
 .catalog {
-  max-width: 1200px;
-  margin: auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 24px;
@@ -53,12 +85,10 @@ h1 {
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   border-radius: 18px;
   padding: 16px;
-
   border: 1px solid rgba(255,255,255,0.25);
   box-shadow:
     0 8px 30px rgba(0,0,0,0.35),
     inset 0 1px 0 rgba(255,255,255,0.15);
-
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -102,10 +132,18 @@ h1 {
 }
 
 /* ===== АДАПТИВ ===== */
-@media (max-width: 480px) {
-  .card img {
-    height: 150px;
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr;
   }
+
+  .info-box {
+    position: static;
+  }
+}
+
+@media (max-width: 480px) {
+  .card img { height: 150px; }
 }
 </style>
 </head>
@@ -114,7 +152,21 @@ h1 {
 
 <h1>Каталог товаров</h1>
 
-<div class="catalog" id="catalog"></div>
+<div class="main-layout">
+
+  <!-- ===== КАТАЛОГ ===== -->
+  <div class="catalog" id="catalog"></div>
+
+  <!-- ===== ИНФО СПРАВА ===== -->
+  <aside class="info-box">
+    <h2>Наши контакты</h2>
+    <p><strong>Dist. 8168</strong></p>
+    <p>Алекс — (520) 331-9666</p>
+    <p>Зик — (205) 195-0992</p>
+    <p>Нолан — (480) 067-5061</p>
+  </aside>
+
+</div>
 
 <script>
 const DATA_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
@@ -123,7 +175,6 @@ fetch(DATA_URL)
   .then(res => res.json())
   .then(items => {
     const catalog = document.getElementById("catalog");
-
     items.forEach(item => {
       catalog.insertAdjacentHTML("beforeend", `
         <div class="card">
@@ -135,14 +186,8 @@ fetch(DATA_URL)
         </div>
       `);
     });
-  })
-  .catch(err => {
-    document.getElementById("catalog").innerHTML =
-      "<p style='color:white'>Ошибка загрузки данных</p>";
-    console.error(err);
   });
 </script>
 
 </body>
 </html>
-
