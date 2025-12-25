@@ -22,7 +22,11 @@ body {
   padding: 24px;
   box-sizing: border-box;
 }
-
+/* ===== FIX ДЛЯ iOS 15+ ===== */
+@supports (-webkit-touch-callout: none) {
+  body {
+    min-height: -webkit-fill-available;
+  }
 /* ===== ЗАГОЛОВОК ===== */
 h1 {
   color: #fff;
@@ -192,6 +196,7 @@ fetch(DATA_URL)
 
 </body>
 </html>
+
 
 
 
