@@ -1,159 +1,261 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<link rel="icon" type="image/png" href="favicon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
-<link rel="icon" href="favicon.png" type="image/png">
+
 <style>
-body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,rgba(20,20,20,0.85),rgba(10,10,10,0.85)),url("https://i.imgur.com/SCMy3Xr.jpeg");background-size:cover;padding:24px;}
-h1{color:#fff;text-align:center;margin-bottom:32px;}
-.main-layout{max-width:1400px;margin:auto;display:grid;grid-template-columns:1fr 340px;gap:24px;}
-aside{position:sticky;top:24px;}
-.info-box{padding:20px;background:rgba(255,255,255,0.12);backdrop-filter:blur(16px);border-radius:18px;border:1px solid rgba(255,255,255,0.25);color:#fff;margin-bottom:20px;}
-.catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px;}
-.card{background:rgba(255,255,255,0.12);border-radius:18px;padding:16px;color:#fff;display:flex;flex-direction:column;}
-.card img{width:100%;height:180px;object-fit:cover;border-radius:12px;}
-.price{margin-top:12px;font-size:20px;font-weight:700;}
-button{padding:8px;border-radius:8px;border:none;font-weight:600;cursor:pointer;background:#000;color:#fff;transition:0.3s;}
-button:hover{background:linear-gradient(45deg,#000,#333);}
-.counter{display:flex;align-items:center;gap:6px;margin-top:6px;}
-.counter button{width:32px;}
-.counter input{width:60px;text-align:center;padding:6px;border-radius:6px;border:none;}
-.item-total{margin-top:6px;font-weight:600;transition:0.3s;color:#fff;}
-input{width:100%;padding:8px;margin-bottom:8px;border-radius:8px;border:none;}
-@media(max-width:900px){.main-layout{grid-template-columns:1fr;}aside{position:static;}}
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background:
+    linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)),
+    url("https://i.imgur.com/SCMy3Xr.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100svh;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+h1 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 32px;
+  font-weight: 600;
+}
+
+.main-layout {
+  max-width: 1400px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* 🔒 ФИКСАЦИЯ БОКОВОЙ КОЛОНКИ */
+aside {
+  position: sticky;
+  top: 24px;
+}
+
+.info-box {
+  padding: 20px 22px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+.info-box + .info-box {
+  margin-top: 16px;
+}
+
+.info-box h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.info-box p {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.order-btn {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  margin-top: 14px;
+  padding: 12px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: #000;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 120%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.25),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.order-btn:hover::before {
+  left: 120%;
+}
+
+.order-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+}
+
+.catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.category-block {
+  grid-column: 1 / -1;
+}
+
+.category-title {
+  margin: 32px 0 16px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+  padding-bottom: 8px;
+}
+
+/* убираем отступ у первой категории */
+.category-block:first-child .category-title {
+  margin-top: 0;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.card h3 {
+  margin: 14px 0 8px;
+  font-size: 18px;
+}
+
+.card p {
+  font-size: 14px;
+  flex: 1;
+}
+
+.price {
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* на мобилках sticky отключаем — так правильнее */
+  aside {
+    position: static;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <h1>AmmuNation</h1>
+
 <div class="main-layout">
+
   <div class="catalog" id="catalog"></div>
+
   <aside>
     <div class="info-box">
-      <h2>Контакты</h2>
+      <h2>Наши контакты</h2>
+      <p><strong>Dist. 8168</strong></p>
       <p>Алекс — (520) 331-9666</p>
       <p>Зик — (205) 195-0992</p>
       <p>Нолан — (480) 067-5061</p>
     </div>
+
     <div class="info-box">
-      <h2>Корзина</h2>
-      <div id="cart"></div>
-      <p><strong>Итого: <span id="total">0</span></strong></p>
-      <input id="fio" placeholder="ФИО">
-      <input id="phone" placeholder="Телефон">
-      <button style="width:100%" onclick="sendOrder()">Оформить заказ</button>
+      <h2>Заказать</h2>
+      <p>Оформите заказ онлайн</p>
+      <a class="order-btn" href="404.html" target="_blank">Заказать</a>
     </div>
   </aside>
+
 </div>
 
 <script>
-const DATA_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec"; // вставь сюда URL веб-приложения
+const DATA_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
 
-let cart = {};
-let itemsMap = {};
-
-function setQty(name, qty){
-  qty=parseInt(qty);
-  if(!qty||qty<=0){ delete cart[name]; } else { cart[name]=qty; }
-  renderCart(); renderButtons(); updateItemTotal(name);
-}
-function changeQty(name, delta){ setQty(name,(cart[name]||0)+delta); }
-
-function renderCart(){
-  const cartDiv=document.getElementById("cart");
-  const totalSpan=document.getElementById("total");
-  cartDiv.innerHTML="";
-  let sum=0;
-  Object.keys(cart).forEach(name=>{
-    const item=itemsMap[name];
-    const qty=cart[name];
-    const total=qty*Number(item.price);
-    sum+=total;
-    cartDiv.innerHTML+=`<p>${name} × ${qty} = ${total} ${item.currency}</p>`;
-  });
-  totalSpan.textContent=sum+" $";
-}
-
-function updateItemTotal(name){
-  const qty=cart[name]||0;
-  const item=itemsMap[name];
-  const totalSpan=document.querySelector(`.card[data-name="${name}"] .item-total`);
-  if(totalSpan){
-    totalSpan.style.opacity=0;
-    setTimeout(()=>{
-      totalSpan.textContent=qty>0?`Сумма: ${qty*Number(item.price)} ${item.currency}`:'';
-      totalSpan.style.opacity=1;
-    },150);
-  }
-}
-
-function renderButtons(){
-  document.querySelectorAll("[data-item]").forEach(el=>{
-    const name=el.dataset.item;
-    const qty=cart[name]||0;
-    el.innerHTML=qty===0
-      ? `<button onclick="setQty('${name}',1)">В корзину</button>`
-      : `<div class="counter">
-          <button onclick="changeQty('${name}',-1)">−</button>
-          <input type="number" min="0" value="${qty}" onchange="setQty('${name}', this.value)">
-          <button onclick="changeQty('${name}',1)">+</button>
-        </div>`;
-    updateItemTotal(name);
-  });
-}
-
-function sendOrder(){
-  const fio=document.getElementById("fio").value.trim();
-  const phone=document.getElementById("phone").value.trim();
-  if(!fio||!phone||Object.keys(cart).length===0){ alert("Заполните все поля и добавьте товар"); return; }
-
-  const items=Object.keys(cart).map(k=>({...itemsMap[k], qty:cart[k], total:cart[k]*Number(itemsMap[k].price)}));
-
-  fetch(DATA_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json;charset=UTF-8"},
-    body:JSON.stringify({name:fio, phone, items})
-  })
-  .then(res=>res.json())
-  .then(data=>{
-    if(data.status==="ok"){ 
-      alert("Заказ отправлен!"); cart={}; renderCart(); renderButtons();
-      document.getElementById("fio").value=""; document.getElementById("phone").value="";
-    } else { console.error(data); alert("Ошибка при отправке"); }
-  })
-  .catch(err=>{console.error(err); alert("Ошибка отправки");});
-}
-
-/* ===== ЗАГРУЗКА КАТАЛОГА ===== */
 fetch(DATA_URL)
-.then(res=>res.json())
-.then(items=>{
-  const catalog=document.getElementById("catalog");
-  const grouped={};
-  items.forEach(item=>{
-    itemsMap[item.name]=item;
-    const cat=item.category||"Другое";
-    if(!grouped[cat]) grouped[cat]=[];
-    grouped[cat].push(item);
-  });
-  Object.keys(grouped).forEach(cat=>{
-    catalog.innerHTML+=`<div class="category-title">${cat}</div>`;
-    grouped[cat].forEach(item=>{
-      catalog.innerHTML+=`
-      <div class="card" data-name="${item.name}">
-        <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
-        <h3>${item.name}</h3>
-        <p>${item.description||""}</p>
-        <div class="price">${item.price} ${item.currency}</div>
-        <div class="item-total"></div>
-        <div data-item="${item.name}"></div>
-      </div>`;
+  .then(res => res.json())
+  .then(items => {
+    const catalog = document.getElementById("catalog");
+    const grouped = {};
+
+    items.forEach(item => {
+      const category = item.category || "Другое";
+      if (!grouped[category]) grouped[category] = [];
+      grouped[category].push(item);
+    });
+
+    Object.keys(grouped).forEach(category => {
+      catalog.insertAdjacentHTML("beforeend", `
+        <div class="category-block">
+          <div class="category-title">${category}</div>
+        </div>
+      `);
+
+      grouped[category].forEach(item => {
+        catalog.insertAdjacentHTML("beforeend", `
+          <div class="card">
+            <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+            <h3>${item.name}</h3>
+            <p>${item.description}</p>
+            <div class="price">${item.price} ${item.currency}</div>
+          </div>
+        `);
+      });
     });
   });
-  renderButtons();
-})
-.catch(()=>alert("Ошибка загрузки каталога"));
 </script>
+
 </body>
 </html>
