@@ -23,7 +23,7 @@ body{
 
 h1{text-align:center;margin-bottom:32px}
 
-/* ===== ЛЕЙАУТ ===== */
+/* ===== LAYOUT ===== */
 .main-layout{
   max-width:1400px;
   margin:auto;
@@ -32,7 +32,6 @@ h1{text-align:center;margin-bottom:32px}
   gap:24px;
 }
 
-/* ===== SIDEBAR ===== */
 aside{
   position:sticky;
   top:24px;
@@ -41,7 +40,7 @@ aside{
   gap:16px;
 }
 
-/* ===== КАТАЛОГ ===== */
+/* ===== CATALOG ===== */
 .catalog{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -53,7 +52,6 @@ aside{
   font-size:26px;
   font-weight:700;
   margin:48px 0 16px;
-  padding-top:8px;
   border-bottom:1px solid rgba(255,255,255,.25);
 }
 
@@ -110,7 +108,7 @@ aside{
   cursor:pointer;
 }
 
-.btn-del{padding:4px 8px;background:#111}
+.btn-del{background:#111;padding:4px 8px}
 
 /* ===== BOX ===== */
 .info-box{
@@ -140,7 +138,6 @@ aside{
   padding:6px 10px;
   border-radius:10px;
   background:rgba(255,255,255,.08);
-  transition:.2s;
 }
 
 .category-menu a.active{
@@ -173,4 +170,128 @@ aside{
     </div>
 
     <div class="info-box">
-      <h2>Корзина</h2
+      <h2>Корзина</h2>
+      <div id="cart"></div>
+      <p><strong>Итого: <span id="total">0</span></strong></p>
+      <input id="customerName" class="text-input" placeholder="ФИО">
+      <input id="customerPhone" class="text-input" placeholder="Телефон">
+      <button class="btn" onclick="sendOrder()">Оформить заказ</button>
+    </div>
+
+  </aside>
+
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
+let cart=[];
+let sections=[];
+let links=[];
+
+/* ===== LOAD DATA ===== */
+fetch(SCRIPT_URL)
+.then(r=>r.json())
+.then(items=>{
+  const catalog=document.getElementById("catalog");
+  const menu=document.getElementById("categoryMenu");
+  const groups={};
+
+  items.forEach(i=>{
+    const c=i.category || "Другое";
+    (groups[c]=groups[c]||[]).push(i);
+  });
+
+  for(const c in groups){
+    const id="cat-"+c.replace(/\s+/g,"_");
+
+    catalog.innerHTML+=`
+      <div class="category-title" id="${id}">${c}</div>`;
+
+    menu.innerHTML+=`
+      <a href="#" data-target="${id}">${c}</a>`;
+
+    groups[c].forEach(i=>{
+      const pid=i.name.replace(/\s+/g,"_");
+      catalog.innerHTML+=`
+        <div class="card">
+          <img src="${i.image}">
+          <h3>${i.name}</h3>
+          <p>${i.description||""}</p>
+          <div class="price">${i.price} ${i.currency}</div>
+          <input id="q-${pid}" class="qty-input" type="number" value="1" min="1">
+          <button class="btn"
+            onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${pid}').value)">
+            В корзину
+          </button>
+        </div>`;
+    });
+  }
+
+  sections=[...document.querySelectorAll(".category-title")];
+  links=[...document.querySelectorAll(".category-menu a")];
+
+  initScroll();
+});
+
+/* ===== SMOOTH SCROLL ===== */
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-target]");
+  if(!a) return;
+  e.preventDefault();
+  document.getElementById(a.dataset.target)
+    .scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+/* ===== ACTIVE CATEGORY (100% STABLE) ===== */
+function initScroll(){
+  window.addEventListener("scroll",()=>{
+    let current=null;
+
+    for(const sec of sections){
+      if(sec.getBoundingClientRect().top <= 120){
+        current=sec;
+      }
+    }
+
+    if(!current) return;
+
+    links.forEach(l=>l.classList.remove("active"));
+    const link=links.find(l=>l.dataset.target===current.id);
+    if(link) link.classList.add("active");
+  });
+
+  window.dispatchEvent(new Event("scroll"));
+}
+
+/* ===== CART ===== */
+function addToCart(name,price,qty){
+  qty=+qty||1;
+  const f=cart.find(i=>i.name===name);
+  if(f){f.qty+=qty;f.total+=qty*price}
+  else cart.push({name,qty,total:qty*price});
+  renderCart();
+}
+
+function renderCart(){
+  const box=document.getElementById("cart");
+  const total=document.getElementById("total");
+  box.innerHTML="";
+  let sum=0;
+  cart.forEach((i,idx)=>{
+    sum+=i.total;
+    box.innerHTML+=`
+      <div class="cart-item">
+        <span>${i.name} × ${i.qty}</span>
+        <button class="btn-del" onclick="cart.splice(${idx},1);renderCart()">✕</button>
+      </div>`;
+  });
+  total.textContent=sum;
+}
+
+function sendOrder(){
+  alert("Заказ отправлен");
+}
+</script>
+
+</body>
+</html>
