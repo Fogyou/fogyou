@@ -58,18 +58,19 @@ h1{text-align:center;margin-bottom:32px}
 
 .price{font-size:20px;font-weight:700}
 
-/* ===== ПОЛЯ ВВОДА ===== */
-input.qty,
-input[type="text"],
-input[type="number"]{
+/* ===== ИНПУТЫ (ЖЕЛЕЗОБЕТОН) ===== */
+input{
   width:100%;
-  padding:8px;
-  margin-top:6px;
-  border-radius:10px;
+  padding:10px;
+  margin-top:8px;
+  border-radius:12px;
   border:1px solid rgba(255,255,255,.25);
-  background:rgba(0,0,0,.35);
-  color:#fff;
+  background:rgba(0,0,0,.45) !important;
+  color:#fff !important;
   outline:none;
+  appearance:none;
+  -webkit-appearance:none;
+  box-shadow:none;
 }
 
 input::placeholder{
@@ -77,18 +78,18 @@ input::placeholder{
 }
 
 input:focus{
-  border-color:rgba(255,255,255,.5);
-  background:rgba(0,0,0,.45);
+  background:rgba(0,0,0,.55) !important;
+  border-color:rgba(255,255,255,.6);
 }
 
 /* ===== КНОПКИ ===== */
 .btn{
-  margin-top:8px;
+  margin-top:10px;
   padding:10px;
   background:#000;
   color:#fff;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   cursor:pointer;
   font-weight:600;
   transition:.15s;
@@ -99,11 +100,13 @@ input:focus{
 
 .btn-del{
   background:#111;
-  margin-left:6px;
+  margin-left:8px;
 }
 
-/* ===== САЙДБАР ===== */
-aside{
+/* ===== SIDEBAR ===== */
+aside{position:relative}
+
+.sticky-box{
   position:sticky;
   top:24px;
   display:flex;
@@ -120,8 +123,8 @@ aside{
 
 .cart-item{
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
   margin-bottom:6px;
   font-size:14px;
 }
@@ -130,7 +133,7 @@ aside{
 
 @media(max-width:900px){
   .main-layout{grid-template-columns:1fr}
-  aside{position:static}
+  .sticky-box{position:static}
 }
 </style>
 </head>
@@ -144,25 +147,27 @@ aside{
   <div id="catalog" class="catalog"></div>
 
   <aside>
-    <!-- КОНТАКТЫ -->
-    <div class="info-box">
-      <h2>Наши контакты</h2>
-      <p><strong>Dist. 8168</strong></p>
-      <p>Алекс — (520) 331-9666</p>
-      <p>Зик — (205) 195-0992</p>
-      <p>Нолан — (480) 067-5061</p>
-    </div>
+    <div class="sticky-box">
 
-    <!-- КОРЗИНА -->
-    <div class="info-box">
-      <h2>Корзина</h2>
-      <div id="cart"></div>
-      <p><strong>Итого: <span id="total">0</span></strong></p>
+      <div class="info-box">
+        <h2>Наши контакты</h2>
+        <p><strong>Dist. 8168</strong></p>
+        <p>Алекс — (520) 331-9666</p>
+        <p>Зик — (205) 195-0992</p>
+        <p>Нолан — (480) 067-5061</p>
+      </div>
 
-      <input id="customerName" type="text" placeholder="ФИО">
-      <input id="customerPhone" type="text" placeholder="Телефон">
+      <div class="info-box">
+        <h2>Корзина</h2>
+        <div id="cart"></div>
+        <p><strong>Итого: <span id="total">0</span></strong></p>
 
-      <button class="btn" onclick="sendOrder()">Оформить заказ</button>
+        <input id="customerName" placeholder="ФИО">
+        <input id="customerPhone" placeholder="Телефон">
+
+        <button class="btn" onclick="sendOrder()">Оформить заказ</button>
+      </div>
+
     </div>
   </aside>
 
@@ -173,9 +178,7 @@ const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1
 let cart=[];
 
 /* КАТАЛОГ */
-fetch(SCRIPT_URL)
-.then(r=>r.json())
-.then(items=>{
+fetch(SCRIPT_URL).then(r=>r.json()).then(items=>{
   const catalog=document.getElementById("catalog");
   const groups={};
 
@@ -195,7 +198,7 @@ fetch(SCRIPT_URL)
           <h3>${i.name}</h3>
           <p>${i.description||""}</p>
           <div class="price">${i.price} ${i.currency}</div>
-          <input class="qty" id="q-${id}" type="number" value="1" min="1">
+          <input id="q-${id}" type="number" value="1" min="1">
           <button class="btn"
             onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${id}').value)">
             В корзину
@@ -214,8 +217,8 @@ function addToCart(name,price,qty){
   renderCart();
 }
 
-function removeFromCart(index){
-  cart.splice(index,1);
+function removeFromCart(i){
+  cart.splice(i,1);
   renderCart();
 }
 
@@ -233,7 +236,6 @@ function renderCart(){
         <button class="btn btn-del" onclick="removeFromCart(${idx})">✕</button>
       </div>`;
   });
-
   total.textContent=sum;
 }
 
@@ -241,8 +243,8 @@ function renderCart(){
 function sendOrder(){
   if(cart.length===0)return alert("Корзина пуста");
 
-  const params=new URLSearchParams();
-  params.append("data",JSON.stringify({
+  const p=new URLSearchParams();
+  p.append("data",JSON.stringify({
     name:customerName.value,
     phone:customerPhone.value,
     items:cart
@@ -252,7 +254,7 @@ function sendOrder(){
     method:"POST",
     mode:"no-cors",
     headers:{ "Content-Type":"application/x-www-form-urlencoded" },
-    body:params.toString()
+    body:p.toString()
   });
 
   alert("Заказ отправлен");
