@@ -6,6 +6,8 @@
 <title>AmmuNation</title>
 
 <style>
+*{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Inter,Arial,sans-serif;
@@ -20,13 +22,17 @@ body{
 
 h1{text-align:center;margin-bottom:32px}
 
+/* ===== КОНТЕЙНЕР ===== */
+.wrapper{
+  max-width:1400px;
+  margin:0 auto;
+  position:relative;
+}
+
 /* ===== ЛЕЙАУТ ===== */
 .main-layout{
-  max-width:1400px;
-  margin:auto;
   display:grid;
-  grid-template-columns:1fr 360px;
-  gap:24px;
+  grid-template-columns:1fr;
 }
 
 /* ===== КАТАЛОГ ===== */
@@ -34,6 +40,7 @@ h1{text-align:center;margin-bottom:32px}
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
   gap:24px;
+  padding-right:360px; /* место под сайдбар */
 }
 
 .category-title{
@@ -49,8 +56,6 @@ h1{text-align:center;margin-bottom:32px}
   border:1px solid rgba(255,255,255,.25);
   border-radius:18px;
   padding:16px;
-  display:flex;
-  flex-direction:column;
 }
 
 .card img{
@@ -62,18 +67,22 @@ h1{text-align:center;margin-bottom:32px}
 
 .price{font-size:20px;font-weight:700;margin:8px 0}
 
-/* ===== ИНПУТЫ ===== */
+/* ===== ИНПУТ КОЛИЧЕСТВА ===== */
 .qty-input{
-  width:6ch;
-  padding:8px 10px;
-  border-radius:12px;
+  width:6ch !important;
+  max-width:6ch !important;
+  padding:6px 6px;
+  border-radius:10px;
   border:1px solid rgba(255,255,255,.25);
   background:rgba(0,0,0,.45);
   color:#fff;
   text-align:center;
   outline:none;
+  box-sizing:content-box;
+  flex:none;
 }
 
+/* ===== ТЕКСТОВЫЕ ИНПУТЫ ===== */
 .text-input{
   width:100%;
   padding:10px;
@@ -97,22 +106,21 @@ input::placeholder{color:rgba(255,255,255,.7)}
   border-radius:12px;
   cursor:pointer;
   font-weight:600;
-  transition:.15s;
 }
 
 .btn:active{transform:scale(.95)}
 .btn-del{background:#111;padding:4px 8px}
 
-/* ===== FIXED SIDEBAR ===== */
+/* ===== САЙДБАР ===== */
 .sidebar{
   position:fixed;
   top:24px;
-  right:24px;
+  left:50%;
+  transform:translateX(350px); /* ровно к правому краю контейнера */
   width:320px;
   display:flex;
   flex-direction:column;
   gap:16px;
-  z-index:10;
 }
 
 .info-box{
@@ -131,8 +139,12 @@ input::placeholder{color:rgba(255,255,255,.7)}
 }
 
 @media(max-width:1200px){
-  .sidebar{position:static;width:auto}
-  .main-layout{grid-template-columns:1fr}
+  .sidebar{
+    position:static;
+    transform:none;
+    width:auto;
+  }
+  .catalog{padding-right:0}
 }
 </style>
 </head>
@@ -141,11 +153,12 @@ input::placeholder{color:rgba(255,255,255,.7)}
 
 <h1>AmmuNation</h1>
 
-<div class="main-layout">
+<div class="wrapper">
 
-  <div id="catalog" class="catalog"></div>
+  <div class="main-layout">
+    <div id="catalog" class="catalog"></div>
+  </div>
 
-  <!-- SIDEBAR -->
   <div class="sidebar">
 
     <div class="info-box">
@@ -175,22 +188,16 @@ input::placeholder{color:rgba(255,255,255,.7)}
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 let cart=[];
 
-/* КАТАЛОГ */
-fetch(SCRIPT_URL)
-.then(r=>r.json())
-.then(items=>{
+fetch(SCRIPT_URL).then(r=>r.json()).then(items=>{
   const catalog=document.getElementById("catalog");
-  const groups={};
-
+  const g={};
   items.forEach(i=>{
     const c=i.category||"Другое";
-    if(!groups[c])groups[c]=[];
-    groups[c].push(i);
+    (g[c]=g[c]||[]).push(i);
   });
-
-  for(const c in groups){
+  for(const c in g){
     catalog.innerHTML+=`<div class="category-title">${c}</div>`;
-    groups[c].forEach(i=>{
+    g[c].forEach(i=>{
       const id=i.name.replace(/\s+/g,"_");
       catalog.innerHTML+=`
         <div class="card">
@@ -199,8 +206,7 @@ fetch(SCRIPT_URL)
           <p>${i.description||""}</p>
           <div class="price">${i.price} ${i.currency}</div>
           <input id="q-${id}" class="qty-input" type="number" value="1" min="1">
-          <button class="btn"
-            onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${id}').value)">
+          <button class="btn" onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${id}').value)">
             В корзину
           </button>
         </div>`;
@@ -208,59 +214,49 @@ fetch(SCRIPT_URL)
   }
 });
 
-/* КОРЗИНА */
 function addToCart(name,price,qty){
-  qty=Number(qty)||1;
+  qty=+qty||1;
   const f=cart.find(i=>i.name===name);
   if(f){f.qty+=qty;f.total+=qty*price}
   else cart.push({name,qty,total:qty*price});
   renderCart();
 }
 
-function removeFromCart(i){
-  cart.splice(i,1);
-  renderCart();
-}
+function removeFromCart(i){cart.splice(i,1);renderCart();}
 
 function renderCart(){
   const box=document.getElementById("cart");
   const total=document.getElementById("total");
   box.innerHTML="";
-  let sum=0;
+  let s=0;
   cart.forEach((i,idx)=>{
-    sum+=i.total;
+    s+=i.total;
     box.innerHTML+=`
       <div class="cart-item">
         <span>${i.name} × ${i.qty} = ${i.total}</span>
         <button class="btn btn-del" onclick="removeFromCart(${idx})">✕</button>
       </div>`;
   });
-  total.textContent=sum;
+  total.textContent=s;
 }
 
-/* ОТПРАВКА */
 function sendOrder(){
-  if(cart.length===0)return alert("Корзина пуста");
-
+  if(!cart.length)return alert("Корзина пуста");
   const p=new URLSearchParams();
   p.append("data",JSON.stringify({
     name:customerName.value,
     phone:customerPhone.value,
     items:cart
   }));
-
   fetch(SCRIPT_URL,{
     method:"POST",
     mode:"no-cors",
-    headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
     body:p.toString()
   });
-
   alert("Заказ отправлен");
-  cart=[];
-  renderCart();
-  customerName.value="";
-  customerPhone.value="";
+  cart=[];renderCart();
+  customerName.value="";customerPhone.value="";
 }
 </script>
 
