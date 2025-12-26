@@ -56,11 +56,13 @@ aside {
 }
 
 .category-title {
-  grid-column: 1/-1;
+  grid-column: 1 / -1;
   font-size: 26px;
+  font-weight: 700;
   color: #fff;
   border-bottom: 1px solid rgba(255,255,255,0.25);
   margin-top: 32px;
+  padding-bottom: 8px;
 }
 
 .card {
@@ -102,6 +104,15 @@ input {
   border-radius: 8px;
   border: none;
 }
+
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+  aside {
+    position: static;
+  }
+}
 </style>
 </head>
 
@@ -124,7 +135,7 @@ input {
     <div class="info-box">
       <h2>Корзина</h2>
       <div id="cart"></div>
-      <p><strong>Итого: <span id="total">0</span> $</strong></p>
+      <p><strong>Итого: <span id="total">0</span></strong></p>
 
       <input id="fio" placeholder="ФИО">
       <input id="phone" placeholder="Телефон">
@@ -136,22 +147,22 @@ input {
 </div>
 
 <script>
-const DATA_URL = "https://script.google.com/macros/s/AKfycbw3x3geMMWEFNIPqPi1hX1pUwdD3bSyWfXwC4I7W8AfI4kk3Uf_YkqcRQfxRqIKohlpwg/exec";
-const ORDER_URL = DATA_URL;
+/* ===== URL APPS SCRIPT (GET + POST) ===== */
+const API_URL = "https://script.google.com/macros/s/AKfycbze4o5v2u8ZIi4NQU8UHb9B7miE_CC3TLr9AGPP3yIDvo8g1mQPExljv0fu65UzBfZBsg/exec";
 
 let cart = [];
 
+/* ===== КОРЗИНА ===== */
 function addToCart(item) {
   const found = cart.find(i => i.name === item.name);
   if (found) {
     found.qty++;
-    found.total += item.price;
+    found.total += Number(item.price);
   } else {
     cart.push({
-      name: item.name,
+      ...item,
       qty: 1,
-      price: item.price,
-      total: item.price
+      total: Number(item.price)
     });
   }
   renderCart();
@@ -165,56 +176,76 @@ function renderCart() {
 
   cart.forEach(item => {
     sum += item.total;
-    cartDiv.innerHTML += `<p>${item.name} × ${item.qty} = ${item.total}$</p>`;
+    cartDiv.innerHTML += `
+      <p>${item.name} × ${item.qty} = ${item.total} ${item.currency}</p>
+    `;
   });
 
-  totalSpan.textContent = sum;
+  totalSpan.textContent = sum + " $";
 }
 
+/* ===== ОТПРАВКА ЗАКАЗА ===== */
 function sendOrder() {
-  const name = fio.value.trim();
-  const phone = phone.value.trim();
+  const name = document.getElementById("fio").value.trim();
+  const phone = document.getElementById("phone").value.trim();
 
   if (!name || !phone || cart.length === 0) {
-    alert("Заполни данные и добавь товар");
+    alert("Заполни ФИО, телефон и добавь товар");
     return;
   }
 
-  fetch(ORDER_URL, {
+  fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ name, phone, items: cart })
-  }).then(() => {
-    alert("Заказ отправлен!");
+    body: JSON.stringify({
+      name,
+      phone,
+      items: cart
+    })
+  })
+  .then(() => {
+    alert("Заказ успешно отправлен!");
     cart = [];
     renderCart();
     fio.value = "";
     phone.value = "";
-  });
+  })
+  .catch(() => alert("Ошибка отправки заказа"));
 }
 
-fetch(DATA_URL)
+/* ===== ЗАГРУЗКА КАТАЛОГА ===== */
+fetch(API_URL)
   .then(res => res.json())
   .then(items => {
     const catalog = document.getElementById("catalog");
-    let currentCategory = "";
+    const grouped = {};
 
     items.forEach(item => {
-      if (item.category !== currentCategory) {
-        currentCategory = item.category;
-        catalog.innerHTML += `<div class="category-title">${currentCategory}</div>`;
-      }
-
-      catalog.innerHTML += `
-        <div class="card">
-          <img src="${item.image}">
-          <h3>${item.name}</h3>
-          <p>${item.description}</p>
-          <div class="price">${item.price} ${item.currency}</div>
-          <button onclick='addToCart(${JSON.stringify(item)})'>В корзину</button>
-        </div>
-      `;
+      const category = item.category || "Другое";
+      if (!grouped[category]) grouped[category] = [];
+      grouped[category].push(item);
     });
-  });
+
+    Object.keys(grouped).forEach(category => {
+      catalog.insertAdjacentHTML("beforeend",
+        `<div class="category-title">${category}</div>`
+      );
+
+      grouped[category].forEach(item => {
+        catalog.insertAdjacentHTML("beforeend", `
+          <div class="card">
+            <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+            <h3>${item.name}</h3>
+            <p>${item.description || ""}</p>
+            <div class="price">${item.price} ${item.currency}</div>
+            <button onclick='addToCart(${JSON.stringify(item)})'>
+              В корзину
+            </button>
+          </div>
+        `);
+      });
+    });
+  })
+  .catch(() => alert("Ошибка загрузки каталога"));
 </script>
 
 </body>
