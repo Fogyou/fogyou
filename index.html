@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
+<link rel="icon" type="image/png" href="favicon.png">
 
 <style>
 *{box-sizing:border-box}
@@ -53,11 +54,11 @@ aside{
   grid-column:1/-1;
   font-size:26px;
   font-weight:700;
-  margin:48px 0 16px;
+  margin:32px 0 16px;
   border-bottom:1px solid rgba(255,255,255,.25);
 }
 
-/* ===== КАРТОЧКИ ===== */
+/* ===== КАРТОЧКА ===== */
 .card{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
@@ -78,15 +79,17 @@ aside{
   margin:8px 0;
 }
 
-/* ===== INPUTS ===== */
+/* ===== ИНПУТЫ ===== */
 .qty-input{
   width:6ch;
+  max-width:6ch;
   padding:6px;
   text-align:center;
   border-radius:10px;
   border:1px solid rgba(255,255,255,.25);
   background:rgba(0,0,0,.45);
   color:#fff;
+  outline:none;
 }
 
 .text-input{
@@ -97,9 +100,12 @@ aside{
   border:1px solid rgba(255,255,255,.25);
   background:rgba(0,0,0,.45);
   color:#fff;
+  outline:none;
 }
 
-/* ===== BUTTONS ===== */
+input::placeholder{color:rgba(255,255,255,.7)}
+
+/* ===== КНОПКИ — ОРИГИНАЛ ===== */
 .btn{
   margin-top:10px;
   padding:10px;
@@ -108,8 +114,10 @@ aside{
   border:none;
   border-radius:12px;
   cursor:pointer;
+  font-weight:600;
 }
 
+.btn:active{transform:scale(.95)}
 .btn-del{background:#111;padding:4px 8px}
 
 /* ===== BOX ===== */
@@ -123,11 +131,12 @@ aside{
 .cart-item{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   font-size:14px;
   margin-bottom:6px;
 }
 
-/* ===== CATEGORY MENU ===== */
+/* ===== МЕНЮ КАТЕГОРИЙ ===== */
 .category-menu{
   display:flex;
   flex-direction:column;
@@ -140,6 +149,7 @@ aside{
   padding:6px 10px;
   border-radius:10px;
   background:rgba(255,255,255,.08);
+  font-size:14px;
 }
 
 .category-menu a.active{
@@ -166,7 +176,6 @@ aside{
 
   <aside>
 
-    <!-- ВОЗВРАЩЁННЫЙ БЛОК КОНТАКТОВ -->
     <div class="info-box">
       <h2>Наши контакты</h2>
       <p><strong>Dist. 8168</strong></p>
@@ -184,8 +193,10 @@ aside{
       <h2>Корзина</h2>
       <div id="cart"></div>
       <p><strong>Итого: <span id="total">0</span></strong></p>
+
       <input id="customerName" class="text-input" placeholder="ФИО">
       <input id="customerPhone" class="text-input" placeholder="Телефон">
+
       <button class="btn" onclick="sendOrder()">Оформить заказ</button>
     </div>
 
@@ -196,10 +207,8 @@ aside{
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 let cart=[];
-let sections=[];
-let links=[];
 
-/* ===== LOAD CATALOG ===== */
+/* ===== КАТАЛОГ + МЕНЮ ===== */
 fetch(SCRIPT_URL)
 .then(r=>r.json())
 .then(items=>{
@@ -208,78 +217,77 @@ fetch(SCRIPT_URL)
   const groups={};
 
   items.forEach(i=>{
-    const c=i.category || "Другое";
+    const c=i.category||"Другое";
     (groups[c]=groups[c]||[]).push(i);
   });
 
   for(const c in groups){
-    const id="cat-"+c.replace(/\s+/g,"_");
+    const anchor=c.replace(/\s+/g,"_");
 
     catalog.innerHTML+=`
-      <div class="category-title" id="${id}">${c}</div>`;
+      <div class="category-title" id="cat-${anchor}">${c}</div>`;
 
     menu.innerHTML+=`
-      <a href="#" data-target="${id}">${c}</a>`;
+      <a href="#" data-target="cat-${anchor}">${c}</a>`;
 
     groups[c].forEach(i=>{
-      const pid=i.name.replace(/\s+/g,"_");
+      const id=i.name.replace(/\s+/g,"_");
       catalog.innerHTML+=`
         <div class="card">
           <img src="${i.image}">
           <h3>${i.name}</h3>
           <p>${i.description||""}</p>
           <div class="price">${i.price} ${i.currency}</div>
-          <input id="q-${pid}" class="qty-input" type="number" value="1" min="1">
+          <input id="q-${id}" class="qty-input" type="number" value="1" min="1">
           <button class="btn"
-            onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${pid}').value)">
+            onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${id}').value)">
             В корзину
-          </button>
-        </div>`;
+          </button>`;
     });
   }
 
-  sections=[...document.querySelectorAll(".category-title")];
-  links=[...document.querySelectorAll(".category-menu a")];
-
-  initScroll();
+  initScrollSpy();
 });
 
-/* ===== SMOOTH SCROLL ===== */
+/* ===== ПЛАВНЫЙ СКРОЛЛ ===== */
 document.addEventListener("click",e=>{
-  const a=e.target.closest("[data-target]");
-  if(!a) return;
+  const link=e.target.closest("[data-target]");
+  if(!link) return;
   e.preventDefault();
-  document.getElementById(a.dataset.target)
+  document.getElementById(link.dataset.target)
     .scrollIntoView({behavior:"smooth",block:"start"});
 });
 
-/* ===== ACTIVE CATEGORY (СТАБИЛЬНО) ===== */
-function initScroll(){
+/* ===== ПОДСВЕТКА (БЕЗ ПРОПУСКОВ) ===== */
+function initScrollSpy(){
+  const sections=[...document.querySelectorAll(".category-title")];
+  const links=[...document.querySelectorAll(".category-menu a")];
+
   window.addEventListener("scroll",()=>{
     let current=null;
-
-    for(const sec of sections){
-      if(sec.getBoundingClientRect().top <= 120){
-        current=sec;
-      }
-    }
-
+    sections.forEach(s=>{
+      if(s.getBoundingClientRect().top<=120) current=s;
+    });
     if(!current) return;
-
     links.forEach(l=>l.classList.remove("active"));
-    const link=links.find(l=>l.dataset.target===current.id);
-    if(link) link.classList.add("active");
+    const a=links.find(l=>l.dataset.target===current.id);
+    if(a) a.classList.add("active");
   });
 
   window.dispatchEvent(new Event("scroll"));
 }
 
-/* ===== CART ===== */
+/* ===== КОРЗИНА — ОРИГИНАЛ ===== */
 function addToCart(name,price,qty){
   qty=+qty||1;
   const f=cart.find(i=>i.name===name);
   if(f){f.qty+=qty;f.total+=qty*price}
   else cart.push({name,qty,total:qty*price});
+  renderCart();
+}
+
+function removeFromCart(i){
+  cart.splice(i,1);
   renderCart();
 }
 
@@ -292,15 +300,36 @@ function renderCart(){
     sum+=i.total;
     box.innerHTML+=`
       <div class="cart-item">
-        <span>${i.name} × ${i.qty}</span>
-        <button class="btn-del" onclick="cart.splice(${idx},1);renderCart()">✕</button>
+        <span>${i.name} × ${i.qty} = ${i.total}</span>
+        <button class="btn btn-del" onclick="removeFromCart(${idx})">✕</button>
       </div>`;
   });
   total.textContent=sum;
 }
 
+/* ===== ОТПРАВКА — ОРИГИНАЛ ===== */
 function sendOrder(){
+  if(!cart.length)return alert("Корзина пуста");
+
+  const p=new URLSearchParams();
+  p.append("data",JSON.stringify({
+    name:customerName.value,
+    phone:customerPhone.value,
+    items:cart
+  }));
+
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:p.toString()
+  });
+
   alert("Заказ отправлен");
+  cart=[];
+  renderCart();
+  customerName.value="";
+  customerPhone.value="";
 }
 </script>
 
