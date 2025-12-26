@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<link rel="icon" type="image/png" href="favicon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
@@ -14,7 +13,6 @@ body {
     linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)),
     url("https://i.imgur.com/SCMy3Xr.jpeg");
   background-size: cover;
-  background-position: center;
   background-attachment: fixed;
   min-height: 100svh;
   padding: 24px;
@@ -30,13 +28,14 @@ h1 {
   max-width: 1400px;
   margin: auto;
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 340px;
   gap: 24px;
 }
 
 aside {
   position: sticky;
   top: 24px;
+  align-self: start;
 }
 
 .info-box {
@@ -58,11 +57,9 @@ aside {
 .category-title {
   grid-column: 1 / -1;
   font-size: 26px;
-  font-weight: 700;
   color: #fff;
   border-bottom: 1px solid rgba(255,255,255,0.25);
   margin-top: 32px;
-  padding-bottom: 8px;
 }
 
 .card {
@@ -82,19 +79,27 @@ aside {
 .price {
   font-size: 20px;
   font-weight: 700;
-  margin-top: 8px;
 }
 
 button {
-  margin-top: 10px;
   width: 100%;
   padding: 10px;
-  border: none;
   border-radius: 10px;
-  background: #2ecc71;
-  color: #000;
+  border: none;
   font-weight: 600;
   cursor: pointer;
+  background: #2ecc71;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.counter button {
+  width: 32%;
+  font-size: 18px;
 }
 
 input {
@@ -103,15 +108,6 @@ input {
   margin-bottom: 8px;
   border-radius: 8px;
   border: none;
-}
-
-@media (max-width: 900px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
-  aside {
-    position: static;
-  }
 }
 </style>
 </head>
@@ -147,25 +143,21 @@ input {
 </div>
 
 <script>
-/* ===== URL APPS SCRIPT (GET + POST) ===== */
 const API_URL = "https://script.google.com/macros/s/AKfycbze4o5v2u8ZIi4NQU8UHb9B7miE_CC3TLr9AGPP3yIDvo8g1mQPExljv0fu65UzBfZBsg/exec";
 
-let cart = [];
+let cart = {};
+let itemsMap = {};
 
 /* ===== КОРЗИНА ===== */
-function addToCart(item) {
-  const found = cart.find(i => i.name === item.name);
-  if (found) {
-    found.qty++;
-    found.total += Number(item.price);
-  } else {
-    cart.push({
-      ...item,
-      qty: 1,
-      total: Number(item.price)
-    });
+function changeQty(name, delta) {
+  if (!cart[name]) cart[name] = 0;
+  cart[name] += delta;
+
+  if (cart[name] <= 0) {
+    delete cart[name];
   }
   renderCart();
+  renderButtons();
 }
 
 function renderCart() {
@@ -174,42 +166,65 @@ function renderCart() {
   cartDiv.innerHTML = "";
   let sum = 0;
 
-  cart.forEach(item => {
-    sum += item.total;
-    cartDiv.innerHTML += `
-      <p>${item.name} × ${item.qty} = ${item.total} ${item.currency}</p>
-    `;
+  Object.keys(cart).forEach(name => {
+    const item = itemsMap[name];
+    const qty = cart[name];
+    const total = qty * Number(item.price);
+    sum += total;
+
+    cartDiv.innerHTML += `<p>${name} × ${qty} = ${total} ${item.currency}</p>`;
   });
 
   totalSpan.textContent = sum + " $";
 }
 
+/* ===== КНОПКИ В КАРТОЧКАХ ===== */
+function renderButtons() {
+  document.querySelectorAll("[data-item]").forEach(el => {
+    const name = el.dataset.item;
+    const qty = cart[name] || 0;
+
+    if (qty === 0) {
+      el.innerHTML = `<button onclick="changeQty('${name}',1)">В корзину</button>`;
+    } else {
+      el.innerHTML = `
+        <div class="counter">
+          <button onclick="changeQty('${name}',-1)">−</button>
+          <strong>${qty}</strong>
+          <button onclick="changeQty('${name}',1)">+</button>
+        </div>
+      `;
+    }
+  });
+}
+
 /* ===== ОТПРАВКА ЗАКАЗА ===== */
 function sendOrder() {
-  const name = document.getElementById("fio").value.trim();
-  const phone = document.getElementById("phone").value.trim();
+  const name = fio.value.trim();
+  const phone = phone.value.trim();
 
-  if (!name || !phone || cart.length === 0) {
-    alert("Заполни ФИО, телефон и добавь товар");
+  if (!name || !phone || Object.keys(cart).length === 0) {
+    alert("Заполни данные и добавь товар");
     return;
   }
 
+  const items = Object.keys(cart).map(key => ({
+    ...itemsMap[key],
+    qty: cart[key],
+    total: cart[key] * Number(itemsMap[key].price)
+  }));
+
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({
-      name,
-      phone,
-      items: cart
-    })
-  })
-  .then(() => {
-    alert("Заказ успешно отправлен!");
-    cart = [];
+    body: JSON.stringify({ name, phone, items })
+  }).then(() => {
+    alert("Заказ отправлен!");
+    cart = {};
     renderCart();
+    renderButtons();
     fio.value = "";
     phone.value = "";
-  })
-  .catch(() => alert("Ошибка отправки заказа"));
+  });
 }
 
 /* ===== ЗАГРУЗКА КАТАЛОГА ===== */
@@ -220,32 +235,29 @@ fetch(API_URL)
     const grouped = {};
 
     items.forEach(item => {
-      const category = item.category || "Другое";
-      if (!grouped[category]) grouped[category] = [];
-      grouped[category].push(item);
+      itemsMap[item.name] = item;
+      const cat = item.category || "Другое";
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(item);
     });
 
-    Object.keys(grouped).forEach(category => {
-      catalog.insertAdjacentHTML("beforeend",
-        `<div class="category-title">${category}</div>`
-      );
-
-      grouped[category].forEach(item => {
-        catalog.insertAdjacentHTML("beforeend", `
+    Object.keys(grouped).forEach(cat => {
+      catalog.innerHTML += `<div class="category-title">${cat}</div>`;
+      grouped[cat].forEach(item => {
+        catalog.innerHTML += `
           <div class="card">
-            <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+            <img src="${item.image}">
             <h3>${item.name}</h3>
             <p>${item.description || ""}</p>
             <div class="price">${item.price} ${item.currency}</div>
-            <button onclick='addToCart(${JSON.stringify(item)})'>
-              В корзину
-            </button>
+            <div data-item="${item.name}"></div>
           </div>
-        `);
+        `;
       });
     });
-  })
-  .catch(() => alert("Ошибка загрузки каталога"));
+
+    renderButtons();
+  });
 </script>
 
 </body>
