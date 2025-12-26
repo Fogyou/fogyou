@@ -130,8 +130,8 @@ input{
       <div id="cart"></div>
       <p><strong>Итого: <span id="total">0</span></strong></p>
 
-      <input id="name" placeholder="ФИО">
-      <input id="phone" placeholder="Телефон">
+      <input id="customerName" placeholder="ФИО">
+      <input id="customerPhone" placeholder="Телефон">
 
       <button class="btn" onclick="sendOrder()">Оформить заказ</button>
     </div>
@@ -140,7 +140,7 @@ input{
 </div>
 
 <script>
-/* ===== ССЫЛКИ ===== */
+/* ===== ССЫЛКИ НА GOOGLE APPS SCRIPT ===== */
 const PRODUCTS_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
 const ORDER_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 
@@ -148,31 +148,35 @@ let cart = [];
 
 /* ===== ЗАГРУЗКА КАТАЛОГА ===== */
 fetch(PRODUCTS_URL)
-.then(r=>r.json())
-.then(data=>{
-  const catalog=document.getElementById("catalog");
-  const groups={};
+.then(r => r.json())
+.then(data => {
+  const catalog = document.getElementById("catalog");
+  const groups = {};
 
-  data.forEach(i=>{
-    const c=i.category||"Другое";
-    if(!groups[c])groups[c]=[];
-    groups[c].push(i);
+  data.forEach(item => {
+    const cat = item.category || "Другое";
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(item);
   });
 
-  for(const cat in groups){
-    catalog.insertAdjacentHTML("beforeend",`
-      <div class="category-title">${cat}</div>
-    `);
+  for (const cat in groups) {
+    catalog.insertAdjacentHTML("beforeend",
+      `<div class="category-title">${cat}</div>`
+    );
 
-    groups[cat].forEach(i=>{
-      catalog.insertAdjacentHTML("beforeend",`
+    groups[cat].forEach(item => {
+      const safeId = item.name.replace(/\s+/g,'_');
+
+      catalog.insertAdjacentHTML("beforeend", `
         <div class="card">
-          <img src="${i.image}" onerror="this.src='https://via.placeholder.com/400x250'">
-          <h3>${i.name}</h3>
-          <p>${i.description||""}</p>
-          <div class="price">${i.price} ${i.currency}</div>
-          <input type="number" min="1" value="1" class="qty" id="q-${i.name}">
-          <button class="btn" onclick='addToCart(${JSON.stringify(i)})'>В корзину</button>
+          <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250'">
+          <h3>${item.name}</h3>
+          <p>${item.description || ""}</p>
+          <div class="price">${item.price} ${item.currency}</div>
+          <input type="number" min="1" value="1" class="qty" id="q-${safeId}">
+          <button class="btn" onclick='addToCart("${safeId}", ${item.price}, "${item.name}")'>
+            В корзину
+          </button>
         </div>
       `);
     });
@@ -180,55 +184,67 @@ fetch(PRODUCTS_URL)
 });
 
 /* ===== КОРЗИНА ===== */
-function addToCart(item){
-  const qty=+document.getElementById("q-"+item.name).value||1;
-  const found=cart.find(i=>i.name===item.name);
+function addToCart(id, price, name){
+  const qty = Number(document.getElementById("q-"+id).value) || 1;
+  const found = cart.find(i => i.name === name);
 
   if(found){
-    found.qty+=qty;
-    found.total+=qty*item.price;
-  }else{
-    cart.push({name:item.name,qty:qty,total:qty*item.price});
+    found.qty += qty;
+    found.total += qty * price;
+  } else {
+    cart.push({ name, qty, total: qty * price });
   }
   renderCart();
 }
 
 function renderCart(){
-  const box=document.getElementById("cart");
-  const totalBox=document.getElementById("total");
-  box.innerHTML="";
-  let sum=0;
+  const box = document.getElementById("cart");
+  const totalBox = document.getElementById("total");
+  box.innerHTML = "";
+  let sum = 0;
 
-  cart.forEach(i=>{
-    sum+=i.total;
-    box.innerHTML+=`<p>${i.name} × ${i.qty} = ${i.total}</p>`;
+  cart.forEach(i => {
+    sum += i.total;
+    box.innerHTML += `<p>${i.name} × ${i.qty} = ${i.total}</p>`;
   });
 
-  totalBox.textContent=sum;
+  totalBox.textContent = sum;
 }
 
-/* ===== ОТПРАВКА ===== */
+/* ===== ОТПРАВКА ЗАКАЗА ===== */
 function sendOrder(){
-  const name=document.getElementById("name").value;
-  const phone=document.getElementById("phone").value;
+  const name = document.getElementById("customerName").value.trim();
+  const phone = document.getElementById("customerPhone").value.trim();
 
-  if(!name||!phone||cart.length===0){
-    alert("Заполните данные и добавьте товары");
+  if(!name || !phone || cart.length === 0){
+    alert("Заполните ФИО, телефон и добавьте товары");
     return;
   }
 
   fetch(ORDER_URL,{
     method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({name,phone,items:cart})
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      name: name,
+      phone: phone,
+      items: cart
+    })
   })
-  .then(r=>r.json())
-  .then(r=>{
-    if(r.status==="ok"){
+  .then(r => r.json())
+  .then(r => {
+    if(r.status === "ok"){
       alert("Заказ отправлен!");
-      cart=[];
+      cart = [];
       renderCart();
-    }else alert("Ошибка");
+      document.getElementById("customerName").value = "";
+      document.getElementById("customerPhone").value = "";
+    } else {
+      alert("Ошибка: " + r.message);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Ошибка отправки");
   });
 }
 </script>
