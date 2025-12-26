@@ -27,7 +27,7 @@ html, body {
 .code {
   font-size: 120px;
   font-weight: 800;
-  color: #8b1e1e; /* тёмно-красный, не яркий */
+  color: #8b1e1e; /* тёмно-красный */
   text-shadow: 0 0 20px rgba(139, 30, 30, 0.35);
   margin: 0;
 }
@@ -45,14 +45,19 @@ html, body {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.2);
   color: #fff;
-  text-decoration: none;
+  font-size: 16px;
   font-weight: 600;
+  cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .back:hover {
   background: rgba(255,255,255,0.16);
   transform: translateY(-2px);
+}
+
+.back:active {
+  transform: translateY(0);
 }
 </style>
 </head>
@@ -61,8 +66,11 @@ html, body {
   <div class="wrapper">
     <h1 class="code">404</h1>
     <div class="text">Страница не найдена</div>
-    <a class="back" href="https://fogyou.github.io/fogyou/">Вернуться назад</a>
+
+    <button class="back"
+      onclick="window.location.href='https://fogyou.github.io/fogyou/'">
+      Вернуться назад
+    </button>
   </div>
 </body>
 </html>
-
