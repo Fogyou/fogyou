@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" href="favicon.png" type="image/png">
 <style>
-body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)), url("https://i.imgur.com/SCMy3Xr.jpeg");background-size:cover;padding:24px;}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,rgba(20,20,20,0.85),rgba(10,10,10,0.85)),url("https://i.imgur.com/SCMy3Xr.jpeg");background-size:cover;padding:24px;}
 h1{color:#fff;text-align:center;margin-bottom:32px;}
 .main-layout{max-width:1400px;margin:auto;display:grid;grid-template-columns:1fr 340px;gap:24px;}
 aside{position:sticky;top:24px;}
-.info-box{padding:20px;background: rgba(255,255,255,0.12);backdrop-filter: blur(16px);border-radius:18px;border:1px solid rgba(255,255,255,0.25);color:#fff;margin-bottom:20px;}
+.info-box{padding:20px;background:rgba(255,255,255,0.12);backdrop-filter:blur(16px);border-radius:18px;border:1px solid rgba(255,255,255,0.25);color:#fff;margin-bottom:20px;}
 .catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px;}
-.card{background: rgba(255,255,255,0.12);border-radius:18px;padding:16px;color:#fff;display:flex;flex-direction:column;}
+.card{background:rgba(255,255,255,0.12);border-radius:18px;padding:16px;color:#fff;display:flex;flex-direction:column;}
 .card img{width:100%;height:180px;object-fit:cover;border-radius:12px;}
 .price{margin-top:12px;font-size:20px;font-weight:700;}
 button{padding:8px;border-radius:8px;border:none;font-weight:600;cursor:pointer;background:#000;color:#fff;transition:0.3s;}
@@ -26,7 +26,6 @@ input{width:100%;padding:8px;margin-bottom:8px;border-radius:8px;border:none;}
 </style>
 </head>
 <body>
-
 <h1>AmmuNation</h1>
 <div class="main-layout">
   <div class="catalog" id="catalog"></div>
@@ -49,17 +48,15 @@ input{width:100%;padding:8px;margin-bottom:8px;border-radius:8px;border:none;}
 </div>
 
 <script>
-const DATA_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec"; // вставь URL веб-приложения
+const DATA_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec"; // вставь сюда URL веб-приложения
 
 let cart = {};
 let itemsMap = {};
 
 function setQty(name, qty){
   qty=parseInt(qty);
-  if(!qty || qty<=0){ delete cart[name]; } else { cart[name]=qty; }
-  renderCart();
-  renderButtons();
-  updateItemTotal(name);
+  if(!qty||qty<=0){ delete cart[name]; } else { cart[name]=qty; }
+  renderCart(); renderButtons(); updateItemTotal(name);
 }
 function changeQty(name, delta){ setQty(name,(cart[name]||0)+delta); }
 
@@ -107,58 +104,56 @@ function renderButtons(){
 }
 
 function sendOrder(){
-  const name=document.getElementById("fio").value.trim();
+  const fio=document.getElementById("fio").value.trim();
   const phone=document.getElementById("phone").value.trim();
-  if(!name||!phone||Object.keys(cart).length===0){ alert("Заполните все поля и добавьте товар"); return; }
+  if(!fio||!phone||Object.keys(cart).length===0){ alert("Заполните все поля и добавьте товар"); return; }
 
-  const items=Object.keys(cart).map(key=>({...itemsMap[key], qty:cart[key], total:cart[key]*Number(itemsMap[key].price)}));
+  const items=Object.keys(cart).map(k=>({...itemsMap[k], qty:cart[k], total:cart[k]*Number(itemsMap[k].price)}));
 
   fetch(DATA_URL,{
     method:"POST",
     headers:{"Content-Type":"application/json;charset=UTF-8"},
-    body:JSON.stringify({name,phone,items})
+    body:JSON.stringify({name:fio, phone, items})
   })
   .then(res=>res.json())
   .then(data=>{
     if(data.status==="ok"){ 
-      alert("Заказ отправлен!");
-      cart={}; renderCart(); renderButtons();
+      alert("Заказ отправлен!"); cart={}; renderCart(); renderButtons();
       document.getElementById("fio").value=""; document.getElementById("phone").value="";
-    } else { console.error(data); alert("Ошибка при отправке заказа"); }
+    } else { console.error(data); alert("Ошибка при отправке"); }
   })
-  .catch(err=>{console.error(err); alert("Ошибка отправки заказа");});
+  .catch(err=>{console.error(err); alert("Ошибка отправки");});
 }
 
 /* ===== ЗАГРУЗКА КАТАЛОГА ===== */
 fetch(DATA_URL)
-  .then(res=>res.json())
-  .then(items=>{
-    const catalog=document.getElementById("catalog");
-    const grouped={};
-    items.forEach(item=>{
-      itemsMap[item.name]=item;
-      const cat=item.category||"Другое";
-      if(!grouped[cat]) grouped[cat]=[];
-      grouped[cat].push(item);
+.then(res=>res.json())
+.then(items=>{
+  const catalog=document.getElementById("catalog");
+  const grouped={};
+  items.forEach(item=>{
+    itemsMap[item.name]=item;
+    const cat=item.category||"Другое";
+    if(!grouped[cat]) grouped[cat]=[];
+    grouped[cat].push(item);
+  });
+  Object.keys(grouped).forEach(cat=>{
+    catalog.innerHTML+=`<div class="category-title">${cat}</div>`;
+    grouped[cat].forEach(item=>{
+      catalog.innerHTML+=`
+      <div class="card" data-name="${item.name}">
+        <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+        <h3>${item.name}</h3>
+        <p>${item.description||""}</p>
+        <div class="price">${item.price} ${item.currency}</div>
+        <div class="item-total"></div>
+        <div data-item="${item.name}"></div>
+      </div>`;
     });
-    Object.keys(grouped).forEach(cat=>{
-      catalog.innerHTML+=`<div class="category-title">${cat}</div>`;
-      grouped[cat].forEach(item=>{
-        catalog.innerHTML+=`
-          <div class="card" data-name="${item.name}">
-            <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
-            <h3>${item.name}</h3>
-            <p>${item.description||""}</p>
-            <div class="price">${item.price} ${item.currency}</div>
-            <div class="item-total"></div>
-            <div data-item="${item.name}"></div>
-          </div>`;
-      });
-    });
-    renderButtons();
-  })
-  .catch(()=>alert("Ошибка загрузки каталога"));
+  });
+  renderButtons();
+})
+.catch(()=>alert("Ошибка загрузки каталога"));
 </script>
-
 </body>
 </html>
