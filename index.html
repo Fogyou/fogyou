@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
 <link rel="icon" type="image/png" href="favicon.png">
+
 <style>
 *{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
 
 body{
   margin:0;
@@ -57,6 +60,7 @@ aside{
   border-bottom:1px solid rgba(255,255,255,.25);
 }
 
+/* ===== КАРТОЧКА ===== */
 .card{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
@@ -80,14 +84,12 @@ aside{
 /* ===== ИНПУТЫ ===== */
 .qty-input{
   width:6ch;
-  max-width:6ch;
   padding:6px;
   text-align:center;
   border-radius:10px;
   border:1px solid rgba(255,255,255,.25);
   background:rgba(0,0,0,.45);
   color:#fff;
-  outline:none;
 }
 
 .text-input{
@@ -98,7 +100,6 @@ aside{
   border:1px solid rgba(255,255,255,.25);
   background:rgba(0,0,0,.45);
   color:#fff;
-  outline:none;
 }
 
 input::placeholder{color:rgba(255,255,255,.7)}
@@ -134,6 +135,26 @@ input::placeholder{color:rgba(255,255,255,.7)}
   margin-bottom:6px;
 }
 
+/* ===== МЕНЮ КАТЕГОРИЙ ===== */
+.category-menu{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.category-menu a{
+  color:#fff;
+  text-decoration:none;
+  padding:6px 10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.08);
+  font-size:14px;
+}
+
+.category-menu a:hover{
+  background:rgba(255,255,255,.18);
+}
+
 /* ===== MOBILE ===== */
 @media(max-width:900px){
   .main-layout{
@@ -165,6 +186,11 @@ input::placeholder{color:rgba(255,255,255,.7)}
     </div>
 
     <div class="info-box">
+      <h2>Категории</h2>
+      <nav id="categoryMenu" class="category-menu"></nav>
+    </div>
+
+    <div class="info-box">
       <h2>Корзина</h2>
       <div id="cart"></div>
       <p><strong>Итого: <span id="total">0</span></strong></p>
@@ -183,11 +209,12 @@ input::placeholder{color:rgba(255,255,255,.7)}
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 let cart=[];
 
-/* КАТАЛОГ */
+/* ===== КАТАЛОГ + МЕНЮ ===== */
 fetch(SCRIPT_URL)
 .then(r=>r.json())
 .then(items=>{
   const catalog=document.getElementById("catalog");
+  const menu=document.getElementById("categoryMenu");
   const groups={};
 
   items.forEach(i=>{
@@ -196,7 +223,16 @@ fetch(SCRIPT_URL)
   });
 
   for(const c in groups){
-    catalog.innerHTML+=`<div class="category-title">${c}</div>`;
+    const anchor=c.replace(/\s+/g,"_");
+
+    catalog.innerHTML+=`
+      <div class="category-title" id="cat-${anchor}">
+        ${c}
+      </div>`;
+
+    menu.innerHTML+=`
+      <a href="#cat-${anchor}">${c}</a>`;
+
     groups[c].forEach(i=>{
       const id=i.name.replace(/\s+/g,"_");
       catalog.innerHTML+=`
@@ -215,7 +251,7 @@ fetch(SCRIPT_URL)
   }
 });
 
-/* КОРЗИНА */
+/* ===== КОРЗИНА ===== */
 function addToCart(name,price,qty){
   qty=+qty||1;
   const f=cart.find(i=>i.name===name);
@@ -245,7 +281,7 @@ function renderCart(){
   total.textContent=sum;
 }
 
-/* ОТПРАВКА */
+/* ===== ОТПРАВКА ===== */
 function sendOrder(){
   if(!cart.length)return alert("Корзина пуста");
 
