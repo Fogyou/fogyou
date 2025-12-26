@@ -6,24 +6,24 @@
 <title>AmmuNation</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
-body { margin: 0; font-family: Inter, Arial, sans-serif; background: linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)), url("https://i.imgur.com/SCMy3Xr.jpeg"); background-size: cover; background-attachment: fixed; padding: 24px; }
-h1 { color: #fff; text-align: center; margin-bottom: 32px; }
-.main-layout { max-width: 1400px; margin: auto; display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
-aside { position: sticky; top: 24px; }
-.info-box { padding: 20px; background: rgba(255,255,255,0.12); backdrop-filter: blur(16px); border-radius: 18px; border: 1px solid rgba(255,255,255,0.25); color: #fff; margin-bottom: 20px; }
-.catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px; }
-.category-title { grid-column: 1 / -1; font-size: 26px; font-weight: 700; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.25); margin-top: 32px; }
-.card { background: rgba(255,255,255,0.12); border-radius: 18px; padding: 16px; color: #fff; }
-.card img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; }
-.price { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
-button { padding: 8px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; background: #000; color: #fff; transition: background 0.3s, transform 0.2s; }
-button:hover { background: linear-gradient(45deg, #000, #333); transform: translateY(-2px); }
-.counter { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-.counter button { width: 32px; }
-.counter input { width: 60px; text-align: center; padding: 6px; border-radius: 6px; border: none; }
-.item-total { margin-top: 6px; font-weight: 600; transition: all 0.3s ease; color: #fff; }
-input { width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 8px; border: none; }
-@media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } aside { position: static; } }
+body { margin:0; font-family:Inter, Arial, sans-serif; background:linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)), url("https://i.imgur.com/SCMy3Xr.jpeg"); background-size: cover; background-attachment: fixed; padding:24px; }
+h1 { color:#fff; text-align:center; margin-bottom:32px; }
+.main-layout { max-width:1400px; margin:auto; display:grid; grid-template-columns:1fr 340px; gap:24px; }
+aside { position:sticky; top:24px; }
+.info-box { padding:20px; background: rgba(255,255,255,0.12); backdrop-filter: blur(16px); border-radius:18px; border:1px solid rgba(255,255,255,0.25); color:#fff; margin-bottom:20px; }
+.catalog { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap:24px; }
+.category-title { grid-column:1/-1; font-size:26px; font-weight:700; color:#fff; border-bottom:1px solid rgba(255,255,255,0.25); margin-top:32px; }
+.card { background: rgba(255,255,255,0.12); border-radius:18px; padding:16px; color:#fff; }
+.card img { width:100%; height:180px; object-fit:cover; border-radius:12px; }
+.price { font-size:20px; font-weight:700; margin-bottom:6px; }
+button { padding:8px; border-radius:8px; border:none; font-weight:600; cursor:pointer; background:#000; color:#fff; transition: background 0.3s, transform 0.2s; }
+button:hover { background: linear-gradient(45deg,#000,#333); transform: translateY(-2px); }
+.counter { display:flex; align-items:center; gap:6px; margin-top:6px; }
+.counter button { width:32px; }
+.counter input { width:60px; text-align:center; padding:6px; border-radius:6px; border:none; }
+.item-total { margin-top:6px; font-weight:600; transition: all 0.3s ease; color:#fff; }
+input { width:100%; padding:8px; margin-bottom:8px; border-radius:8px; border:none; }
+@media (max-width:900px) { .main-layout { grid-template-columns:1fr; } aside { position:static; } }
 </style>
 </head>
 <body>
@@ -55,17 +55,17 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzpU5nh65HNwJrX6t61gkvX
 let cart = {};
 let itemsMap = {};
 
-/* Изменение количества товара */
-function setQty(name, qty) {
-  qty = parseInt(qty);
-  if(!qty || qty <=0){ delete cart[name]; } else { cart[name]=qty; }
+/* ===== ИЗМЕНЕНИЕ КОЛИЧЕСТВА ===== */
+function setQty(name, qty){
+  qty=parseInt(qty);
+  if(!qty || qty<=0){ delete cart[name]; } else { cart[name]=qty; }
   renderCart();
   renderButtons();
   updateItemTotal(name);
 }
 function changeQty(name, delta){ setQty(name,(cart[name]||0)+delta); }
 
-/* Обновление корзины */
+/* ===== КОРЗИНА ===== */
 function renderCart(){
   const cartDiv=document.getElementById("cart");
   const totalSpan=document.getElementById("total");
@@ -81,7 +81,7 @@ function renderCart(){
   totalSpan.textContent=sum+" $";
 }
 
-/* Плавное обновление суммы на карточке */
+/* ===== ПЛАВНОЕ ОБНОВЛЕНИЕ СУММЫ НА КАРТОЧКЕ ===== */
 function updateItemTotal(name){
   const qty=cart[name]||0;
   const item=itemsMap[name];
@@ -95,7 +95,7 @@ function updateItemTotal(name){
   }
 }
 
-/* Кнопки и поле ввода */
+/* ===== КНОПКИ + ПОЛЕ ВВОДА ===== */
 function renderButtons(){
   document.querySelectorAll("[data-item]").forEach(el=>{
     const name=el.dataset.item;
@@ -111,23 +111,45 @@ function renderButtons(){
   });
 }
 
-/* Отправка заказа */
+/* ===== ОТПРАВКА ЗАКАЗА ===== */
 function sendOrder(){
   const fioInput=document.getElementById("fio");
   const phoneInput=document.getElementById("phone");
   const name=fioInput.value.trim();
   const phone=phoneInput.value.trim();
-  if(!name||!phone||Object.keys(cart).length===0){ alert("Заполни данные и добавь товар"); return; }
+  if(!name || !phone || Object.keys(cart).length===0){ alert("Заполни данные и добавь товар"); return; }
 
   const items=Object.keys(cart).map(key=>({...itemsMap[key], qty:cart[key], total:cart[key]*Number(itemsMap[key].price)}));
 
-  fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name, phone, items})})
-    .then(res=>res.json())
-    .then(()=>{ alert("Заказ отправлен!"); cart={}; renderCart(); renderButtons(); fioInput.value=""; phoneInput.value=""; })
-    .catch(()=>alert("Ошибка отправки заказа"));
+  fetch(API_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json;charset=UTF-8"},
+    body:JSON.stringify({name, phone, items})
+  })
+  .then(res=>{
+    if(res.ok) return res.json();
+    else throw new Error("Ошибка сети");
+  })
+  .then(data=>{
+    if(data.status==="ok"){
+      alert("Заказ отправлен!");
+      cart={};
+      renderCart();
+      renderButtons();
+      fioInput.value="";
+      phoneInput.value="";
+    } else {
+      console.error(data);
+      alert("Ошибка при отправке заказа");
+    }
+  })
+  .catch(err=>{
+    console.error(err);
+    alert("Ошибка отправки заказа");
+  });
 }
 
-/* Загрузка каталога */
+/* ===== ЗАГРУЗКА КАТАЛОГА ===== */
 fetch(API_URL)
   .then(res=>res.json())
   .then(items=>{
