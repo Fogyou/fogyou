@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
 
-<!-- ✅ FAVICON -->
+<!-- Favicon -->
 <link rel="icon" type="image/png" href="favicon.png">
 
 <style>
@@ -118,6 +118,15 @@ input {
   border-radius: 8px;
   border: none;
 }
+
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+  aside {
+    position: static;
+  }
+}
 </style>
 </head>
 
@@ -186,9 +195,7 @@ function renderCart() {
     const total = qty * Number(item.price);
     sum += total;
 
-    cartDiv.innerHTML += `
-      <p>${name} × ${qty} = ${total} ${item.currency}</p>
-    `;
+    cartDiv.innerHTML += `<p>${name} × ${qty} = ${total} ${item.currency}</p>`;
   });
 
   totalSpan.textContent = sum + " $";
@@ -205,8 +212,7 @@ function renderButtons() {
       : `
         <div class="counter">
           <button onclick="changeQty('${name}',-1)">−</button>
-          <input type="number" min="0" value="${qty}"
-            onchange="setQty('${name}', this.value)">
+          <input type="number" min="0" value="${qty}" onchange="setQty('${name}', this.value)">
           <button onclick="changeQty('${name}',1)">+</button>
         </div>
       `;
@@ -231,15 +237,19 @@ function sendOrder() {
 
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ name, phone, items })
-  }).then(() => {
+    body: JSON.stringify({ name, phone, items }),
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(res => res.json())
+  .then(() => {
     alert("Заказ отправлен!");
     cart = {};
     renderCart();
     renderButtons();
     fio.value = "";
     phone.value = "";
-  });
+  })
+  .catch(() => alert("Ошибка отправки заказа"));
 }
 
 /* ===== ЗАГРУЗКА КАТАЛОГА ===== */
@@ -261,7 +271,7 @@ fetch(API_URL)
       grouped[cat].forEach(item => {
         catalog.innerHTML += `
           <div class="card">
-            <img src="${item.image}">
+            <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
             <h3>${item.name}</h3>
             <p>${item.description || ""}</p>
             <div class="price">${item.price} ${item.currency}</div>
@@ -272,9 +282,9 @@ fetch(API_URL)
     });
 
     renderButtons();
-  });
+  })
+  .catch(() => alert("Ошибка загрузки каталога"));
 </script>
 
 </body>
 </html>
-
