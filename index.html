@@ -4,23 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
-
-<!-- Favicon -->
 <link rel="icon" type="image/png" href="favicon.png">
-
 <style>
-body {
-  margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background:
-    linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)),
-    url("https://i.imgur.com/SCMy3Xr.jpeg");
-  background-size: cover;
-  background-attachment: fixed;
-  min-height: 100svh;
-  padding: 24px;
-}
-
+body { margin: 0; font-family: Inter, Arial, sans-serif; background: linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)), url("https://i.imgur.com/SCMy3Xr.jpeg"); background-size: cover; background-attachment: fixed; padding: 24px; }
 h1 { color: #fff; text-align: center; margin-bottom: 32px; }
 .main-layout { max-width: 1400px; margin: auto; display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
 aside { position: sticky; top: 24px; }
@@ -30,41 +16,22 @@ aside { position: sticky; top: 24px; }
 .card { background: rgba(255,255,255,0.12); border-radius: 18px; padding: 16px; color: #fff; }
 .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; }
 .price { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
-
-/* Черные кнопки с белым текстом и эффектом перелива */
-button {
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  background: #000;
-  color: #fff;
-  transition: background 0.3s, transform 0.2s;
-}
-button:hover {
-  background: linear-gradient(45deg, #000, #333);
-  transform: translateY(-2px);
-}
-
+button { padding: 8px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; background: #000; color: #fff; transition: background 0.3s, transform 0.2s; }
+button:hover { background: linear-gradient(45deg, #000, #333); transform: translateY(-2px); }
 .counter { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
 .counter button { width: 32px; }
 .counter input { width: 60px; text-align: center; padding: 6px; border-radius: 6px; border: none; }
 .item-total { margin-top: 6px; font-weight: 600; transition: all 0.3s ease; color: #fff; }
-
 input { width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 8px; border: none; }
-
 @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } aside { position: static; } }
 </style>
 </head>
-
 <body>
 
 <h1>AmmuNation</h1>
 
 <div class="main-layout">
   <div class="catalog" id="catalog"></div>
-
   <aside>
     <div class="info-box">
       <h2>Контакты</h2>
@@ -72,15 +39,12 @@ input { width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 8px; borde
       <p>Зик — (205) 195-0992</p>
       <p>Нолан — (480) 067-5061</p>
     </div>
-
     <div class="info-box">
       <h2>Корзина</h2>
       <div id="cart"></div>
       <p><strong>Итого: <span id="total">0</span></strong></p>
-
       <input id="fio" placeholder="ФИО">
       <input id="phone" placeholder="Телефон">
-
       <button style="width:100%" onclick="sendOrder()">Оформить заказ</button>
     </div>
   </aside>
@@ -88,144 +52,110 @@ input { width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 8px; borde
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbzpU5nh65HNwJrX6t61gkvXehp0ttC2B0ESbMeOVkOGCJVO6qcR7Bgj7S_BDZ1T9Qj20Q/exec";
-
 let cart = {};
 let itemsMap = {};
 
-/* ===== ИЗМЕНЕНИЕ КОЛИЧЕСТВА ===== */
+/* Изменение количества товара */
 function setQty(name, qty) {
   qty = parseInt(qty);
-  if (!qty || qty <= 0) { delete cart[name]; } 
-  else { cart[name] = qty; }
+  if(!qty || qty <=0){ delete cart[name]; } else { cart[name]=qty; }
   renderCart();
   renderButtons();
   updateItemTotal(name);
 }
+function changeQty(name, delta){ setQty(name,(cart[name]||0)+delta); }
 
-function changeQty(name, delta) {
-  setQty(name, (cart[name] || 0) + delta);
-}
-
-/* ===== КОРЗИНА ===== */
-function renderCart() {
-  const cartDiv = document.getElementById("cart");
-  const totalSpan = document.getElementById("total");
-  cartDiv.innerHTML = "";
-  let sum = 0;
-
-  Object.keys(cart).forEach(name => {
-    const item = itemsMap[name];
-    const qty = cart[name];
-    const total = qty * Number(item.price);
-    sum += total;
-    cartDiv.innerHTML += `<p>${name} × ${qty} = ${total} ${item.currency}</p>`;
+/* Обновление корзины */
+function renderCart(){
+  const cartDiv=document.getElementById("cart");
+  const totalSpan=document.getElementById("total");
+  cartDiv.innerHTML="";
+  let sum=0;
+  Object.keys(cart).forEach(name=>{
+    const item=itemsMap[name];
+    const qty=cart[name];
+    const total=qty*Number(item.price);
+    sum+=total;
+    cartDiv.innerHTML+=`<p>${name} × ${qty} = ${total} ${item.currency}</p>`;
   });
-
-  totalSpan.textContent = sum + " $";
+  totalSpan.textContent=sum+" $";
 }
 
-/* ===== ОБНОВЛЕНИЕ СУММЫ НА КАРТОЧКЕ С ПЛАВНОЙ АНИМАЦИЕЙ ===== */
-function updateItemTotal(name) {
-  const qty = cart[name] || 0;
-  const item = itemsMap[name];
-  const totalSpan = document.querySelector(`.card[data-name="${name}"] .item-total`);
-  if (totalSpan) {
-    totalSpan.style.opacity = 0;
-    setTimeout(() => {
-      totalSpan.textContent = qty > 0 ? `Сумма: ${qty * Number(item.price)} ${item.currency}` : '';
-      totalSpan.style.opacity = 1;
-    }, 150);
+/* Плавное обновление суммы на карточке */
+function updateItemTotal(name){
+  const qty=cart[name]||0;
+  const item=itemsMap[name];
+  const totalSpan=document.querySelector(`.card[data-name="${name}"] .item-total`);
+  if(totalSpan){
+    totalSpan.style.opacity=0;
+    setTimeout(()=>{
+      totalSpan.textContent=qty>0?`Сумма: ${qty*Number(item.price)} ${item.currency}`:'';
+      totalSpan.style.opacity=1;
+    },150);
   }
 }
 
-/* ===== КНОПКИ + ПОЛЕ ВВОДА ===== */
-function renderButtons() {
-  document.querySelectorAll("[data-item]").forEach(el => {
-    const name = el.dataset.item;
-    const qty = cart[name] || 0;
-
-    el.innerHTML = qty === 0
+/* Кнопки и поле ввода */
+function renderButtons(){
+  document.querySelectorAll("[data-item]").forEach(el=>{
+    const name=el.dataset.item;
+    const qty=cart[name]||0;
+    el.innerHTML=qty===0
       ? `<button onclick="setQty('${name}',1)">В корзину</button>`
-      : `
-        <div class="counter">
+      : `<div class="counter">
           <button onclick="changeQty('${name}',-1)">−</button>
           <input type="number" min="0" value="${qty}" onchange="setQty('${name}', this.value)">
           <button onclick="changeQty('${name}',1)">+</button>
-        </div>
-      `;
-
+        </div>`;
     updateItemTotal(name);
   });
 }
 
-/* ===== ОТПРАВКА ЗАКАЗА ===== */
-function sendOrder() {
-  const name = fio.value.trim();
-  const phone = phone.value.trim();
+/* Отправка заказа */
+function sendOrder(){
+  const fioInput=document.getElementById("fio");
+  const phoneInput=document.getElementById("phone");
+  const name=fioInput.value.trim();
+  const phone=phoneInput.value.trim();
+  if(!name||!phone||Object.keys(cart).length===0){ alert("Заполни данные и добавь товар"); return; }
 
-  if (!name || !phone || Object.keys(cart).length === 0) {
-    alert("Заполни данные и добавь товар");
-    return;
-  }
+  const items=Object.keys(cart).map(key=>({...itemsMap[key], qty:cart[key], total:cart[key]*Number(itemsMap[key].price)}));
 
-  const items = Object.keys(cart).map(key => ({
-    ...itemsMap[key],
-    qty: cart[key],
-    total: cart[key] * Number(itemsMap[key].price)
-  }));
-
-  fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, phone, items })
-  })
-  .then(res => res.json())
-  .then(() => {
-    alert("Заказ отправлен!");
-    cart = {};
-    renderCart();
-    renderButtons();
-    fio.value = "";
-    phone.value = "";
-  })
-  .catch(() => alert("Ошибка отправки заказа"));
+  fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name, phone, items})})
+    .then(res=>res.json())
+    .then(()=>{ alert("Заказ отправлен!"); cart={}; renderCart(); renderButtons(); fioInput.value=""; phoneInput.value=""; })
+    .catch(()=>alert("Ошибка отправки заказа"));
 }
 
-/* ===== ЗАГРУЗКА КАТАЛОГА ===== */
+/* Загрузка каталога */
 fetch(API_URL)
-  .then(res => res.json())
-  .then(items => {
-    const catalog = document.getElementById("catalog");
-    const grouped = {};
-
-    items.forEach(item => {
-      itemsMap[item.name] = item;
-      const cat = item.category || "Другое";
-      if (!grouped[cat]) grouped[cat] = [];
+  .then(res=>res.json())
+  .then(items=>{
+    const catalog=document.getElementById("catalog");
+    const grouped={};
+    items.forEach(item=>{
+      itemsMap[item.name]=item;
+      const cat=item.category||"Другое";
+      if(!grouped[cat]) grouped[cat]=[];
       grouped[cat].push(item);
     });
-
-    Object.keys(grouped).forEach(cat => {
-      catalog.innerHTML += `<div class="category-title">${cat}</div>`;
-      grouped[cat].forEach(item => {
-        catalog.innerHTML += `
+    Object.keys(grouped).forEach(cat=>{
+      catalog.innerHTML+=`<div class="category-title">${cat}</div>`;
+      grouped[cat].forEach(item=>{
+        catalog.innerHTML+=`
           <div class="card" data-name="${item.name}">
             <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
             <h3>${item.name}</h3>
-            <p>${item.description || ""}</p>
+            <p>${item.description||""}</p>
             <div class="price">${item.price} ${item.currency}</div>
             <div class="item-total"></div>
             <div data-item="${item.name}"></div>
-          </div>
-        `;
+          </div>`;
       });
     });
-
     renderButtons();
   })
-  .catch(() => alert("Ошибка загрузки каталога"));
+  .catch(()=>alert("Ошибка загрузки каталога"));
 </script>
-
 </body>
 </html>
-
