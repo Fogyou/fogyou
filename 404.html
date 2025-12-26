@@ -27,7 +27,7 @@ html, body {
 .code {
   font-size: 120px;
   font-weight: 800;
-  color: #8b1e1e; /* тёмно-красный */
+  color: #8b1e1e;
   text-shadow: 0 0 20px rgba(139, 30, 30, 0.35);
   margin: 0;
 }
@@ -38,6 +38,7 @@ html, body {
   color: rgba(255,255,255,0.75);
 }
 
+/* ССЫЛКА, ВЫГЛЯДИТ КАК КНОПКА */
 .back {
   margin-top: 32px;
   padding: 12px 26px;
@@ -47,7 +48,8 @@ html, body {
   color: #fff;
   font-size: 16px;
   font-weight: 600;
-  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -67,10 +69,10 @@ html, body {
     <h1 class="code">404</h1>
     <div class="text">Страница не найдена</div>
 
-    <button class="back"
-      onclick="window.location.href='https://fogyou.github.io/fogyou/'">
+    <a class="back" href="https://fogyou.github.io/fogyou/">
       Вернуться назад
-    </button>
+    </a>
   </div>
 </body>
 </html>
+
