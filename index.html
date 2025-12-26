@@ -23,15 +23,17 @@ body{
 
 h1{text-align:center;margin-bottom:32px}
 
-/* ===== LAYOUT ===== */
+/* ===== ЛЕЙАУТ ===== */
 .main-layout{
   max-width:1400px;
   margin:auto;
   display:grid;
   grid-template-columns:1fr 340px;
   gap:24px;
+  align-items:start;
 }
 
+/* ===== STICKY SIDEBAR ===== */
 aside{
   position:sticky;
   top:24px;
@@ -40,7 +42,7 @@ aside{
   gap:16px;
 }
 
-/* ===== CATALOG ===== */
+/* ===== КАТАЛОГ ===== */
 .catalog{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -55,7 +57,7 @@ aside{
   border-bottom:1px solid rgba(255,255,255,.25);
 }
 
-/* ===== CARD ===== */
+/* ===== КАРТОЧКИ ===== */
 .card{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
@@ -164,6 +166,15 @@ aside{
 
   <aside>
 
+    <!-- ВОЗВРАЩЁННЫЙ БЛОК КОНТАКТОВ -->
+    <div class="info-box">
+      <h2>Наши контакты</h2>
+      <p><strong>Dist. 8168</strong></p>
+      <p>Алекс — (520) 331-9666</p>
+      <p>Зик — (205) 195-0992</p>
+      <p>Нолан — (480) 067-5061</p>
+    </div>
+
     <div class="info-box">
       <h2>Категории</h2>
       <nav id="categoryMenu" class="category-menu"></nav>
@@ -188,7 +199,7 @@ let cart=[];
 let sections=[];
 let links=[];
 
-/* ===== LOAD DATA ===== */
+/* ===== LOAD CATALOG ===== */
 fetch(SCRIPT_URL)
 .then(r=>r.json())
 .then(items=>{
@@ -242,7 +253,7 @@ document.addEventListener("click",e=>{
     .scrollIntoView({behavior:"smooth",block:"start"});
 });
 
-/* ===== ACTIVE CATEGORY (100% STABLE) ===== */
+/* ===== ACTIVE CATEGORY (СТАБИЛЬНО) ===== */
 function initScroll(){
   window.addEventListener("scroll",()=>{
     let current=null;
