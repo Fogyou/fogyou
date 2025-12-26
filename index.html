@@ -8,7 +8,7 @@
 <style>
 body{
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
   background:
     linear-gradient(135deg,rgba(20,20,20,.85),rgba(10,10,10,.85)),
     url("https://i.imgur.com/SCMy3Xr.jpeg");
@@ -17,6 +17,7 @@ body{
   padding:24px;
   color:#fff;
 }
+
 h1{text-align:center;margin-bottom:32px}
 
 .main-layout{
@@ -77,12 +78,39 @@ h1{text-align:center;margin-bottom:32px}
 }
 .btn:active{transform:scale(.95)}
 
-aside{position:sticky;top:24px}
+.btn-del{
+  background:#111;
+  margin-left:6px;
+}
+
+aside{
+  position:sticky;
+  top:24px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
 .info-box{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
   border-radius:18px;
   padding:18px;
+}
+
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+  font-size:14px;
+}
+
+.cart-item span{flex:1}
+
+@media(max-width:900px){
+  .main-layout{grid-template-columns:1fr}
+  aside{position:static}
 }
 </style>
 </head>
@@ -93,26 +121,36 @@ aside{position:sticky;top:24px}
 
 <div class="main-layout">
 
-<div id="catalog" class="catalog"></div>
+  <div id="catalog" class="catalog"></div>
 
-<aside>
-  <div class="info-box">
-    <h2>Корзина</h2>
-    <div id="cart"></div>
-    <p><strong>Итого: <span id="total">0</span></strong></p>
+  <aside>
+    <!-- НАШИ КОНТАКТЫ -->
+    <div class="info-box">
+      <h2>Наши контакты</h2>
+      <p><strong>Dist. 8168</strong></p>
+      <p>Алекс — (520) 331-9666</p>
+      <p>Зик — (205) 195-0992</p>
+      <p>Нолан — (480) 067-5061</p>
+    </div>
 
-    <input id="customerName" placeholder="ФИО">
-    <input id="customerPhone" placeholder="Телефон">
+    <!-- КОРЗИНА -->
+    <div class="info-box">
+      <h2>Корзина</h2>
+      <div id="cart"></div>
+      <p><strong>Итого: <span id="total">0</span></strong></p>
 
-    <button class="btn" onclick="sendOrder()">Оформить заказ</button>
-  </div>
-</aside>
+      <input id="customerName" placeholder="ФИО">
+      <input id="customerPhone" placeholder="Телефон">
+
+      <button class="btn" onclick="sendOrder()">Оформить заказ</button>
+    </div>
+  </aside>
 
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
-let cart = [];
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
+let cart=[];
 
 /* КАТАЛОГ */
 fetch(SCRIPT_URL)
@@ -156,19 +194,30 @@ function addToCart(name,price,qty){
   renderCart();
 }
 
+function removeFromCart(index){
+  cart.splice(index,1);
+  renderCart();
+}
+
 function renderCart(){
   const box=document.getElementById("cart");
   const total=document.getElementById("total");
   box.innerHTML="";
   let sum=0;
-  cart.forEach(i=>{
+
+  cart.forEach((i,idx)=>{
     sum+=i.total;
-    box.innerHTML+=`<p>${i.name} × ${i.qty} = ${i.total}</p>`;
+    box.innerHTML+=`
+      <div class="cart-item">
+        <span>${i.name} × ${i.qty} = ${i.total}</span>
+        <button class="btn btn-del" onclick="removeFromCart(${idx})">✕</button>
+      </div>`;
   });
+
   total.textContent=sum;
 }
 
-/* 🔥 ОТПРАВКА — ЕДИНСТВЕННО ВЕРНЫЙ ВАРИАНТ */
+/* ОТПРАВКА */
 function sendOrder(){
   if(cart.length===0)return alert("Корзина пуста");
 
