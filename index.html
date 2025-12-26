@@ -38,7 +38,7 @@ h1 {
   align-items: start;
 }
 
-/* 🔒 ФИКСАЦИЯ БОКОВОЙ КОЛОНКИ */
+/* 🔒 Контакты всегда на экране */
 aside {
   position: sticky;
   top: 24px;
@@ -57,10 +57,6 @@ aside {
   color: #fff;
 }
 
-.info-box + .info-box {
-  margin-top: 16px;
-}
-
 .info-box h2 {
   margin: 0 0 12px;
   font-size: 20px;
@@ -71,48 +67,6 @@ aside {
   margin: 6px 0;
   font-size: 15px;
   line-height: 1.5;
-}
-
-.order-btn {
-  position: relative;
-  overflow: hidden;
-  display: block;
-  margin-top: 14px;
-  padding: 12px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background: #000;
-  border-radius: 12px;
-  text-decoration: none;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.order-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -120%;
-  width: 120%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255,255,255,0.25),
-    transparent
-  );
-  transition: left 0.6s ease;
-}
-
-.order-btn:hover::before {
-  left: 120%;
-}
-
-.order-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
 }
 
 .catalog {
@@ -134,7 +88,7 @@ aside {
   padding-bottom: 8px;
 }
 
-/* убираем отступ у первой категории */
+/* первая категория на одном уровне с контактами */
 .category-block:first-child .category-title {
   margin-top: 0;
 }
@@ -187,7 +141,6 @@ aside {
     grid-template-columns: 1fr;
   }
 
-  /* на мобилках sticky отключаем — так правильнее */
   aside {
     position: static;
   }
@@ -210,12 +163,6 @@ aside {
       <p>Алекс — (520) 331-9666</p>
       <p>Зик — (205) 195-0992</p>
       <p>Нолан — (480) 067-5061</p>
-    </div>
-
-    <div class="info-box">
-      <h2>Заказать</h2>
-      <p>Оформите заказ онлайн</p>
-      <a class="order-btn" href="404.html" target="_blank">Заказать</a>
     </div>
   </aside>
 
