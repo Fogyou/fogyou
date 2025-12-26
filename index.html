@@ -1,196 +1,117 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<link rel="icon" type="image/png" href="favicon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background:
-    linear-gradient(135deg, rgba(20,20,20,0.85), rgba(10,10,10,0.85)),
-    url("https://i.imgur.com/SCMy3Xr.jpeg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  min-height: 100svh;
-  padding: 24px;
-  box-sizing: border-box;
+body{
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  background:linear-gradient(135deg,rgba(20,20,20,.85),rgba(10,10,10,.85)),
+  url("https://i.imgur.com/SCMy3Xr.jpeg");
+  background-size:cover;
+  background-attachment:fixed;
+  padding:24px;
+  color:#fff;
 }
 
-h1 {
-  color: #fff;
-  text-align: center;
-  margin-bottom: 32px;
-  font-weight: 600;
+h1{text-align:center;margin-bottom:32px}
+
+.main-layout{
+  max-width:1400px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:24px;
 }
 
-.main-layout {
-  max-width: 1400px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 24px;
-  align-items: start;
+.catalog{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:24px;
 }
 
-/* 🔒 ФИКСАЦИЯ БОКОВОЙ КОЛОНКИ */
-aside {
-  position: sticky;
-  top: 24px;
+.category-title{
+  grid-column:1/-1;
+  font-size:26px;
+  font-weight:700;
+  margin:32px 0 16px;
+  border-bottom:1px solid rgba(255,255,255,.25);
 }
 
-.info-box {
-  padding: 20px 22px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.25);
-  box-shadow:
-    0 8px 30px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.15);
-  color: #fff;
+.card{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:18px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  backdrop-filter:blur(16px);
 }
 
-.info-box + .info-box {
-  margin-top: 16px;
+.card img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+  border-radius:12px;
 }
 
-.info-box h2 {
-  margin: 0 0 12px;
-  font-size: 20px;
-  font-weight: 600;
+.card h3{margin:12px 0 6px}
+.card p{font-size:14px;flex:1}
+
+.price{
+  font-size:20px;
+  font-weight:700;
+  margin-top:6px;
 }
 
-.info-box p {
-  margin: 6px 0;
-  font-size: 15px;
-  line-height: 1.5;
+.qty{
+  margin-top:8px;
+  width:100%;
+  padding:6px;
+  border-radius:8px;
+  border:none;
 }
 
-.order-btn {
-  position: relative;
-  overflow: hidden;
-  display: block;
-  margin-top: 14px;
-  padding: 12px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background: #000;
-  border-radius: 12px;
-  text-decoration: none;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.btn{
+  margin-top:8px;
+  padding:10px;
+  background:#000;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.15s;
 }
 
-.order-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -120%;
-  width: 120%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255,255,255,0.25),
-    transparent
-  );
-  transition: left 0.6s ease;
+.btn:hover{background:#111}
+.btn:active{transform:scale(.96)}
+
+aside{position:sticky;top:24px}
+
+.info-box{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:16px;
+  backdrop-filter:blur(16px);
 }
 
-.order-btn:hover::before {
-  left: 120%;
+input{
+  width:100%;
+  padding:8px;
+  border-radius:8px;
+  border:none;
+  margin-bottom:8px;
 }
 
-.order-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-}
-
-.catalog {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
-}
-
-.category-block {
-  grid-column: 1 / -1;
-}
-
-.category-title {
-  margin: 32px 0 16px;
-  font-size: 26px;
-  font-weight: 700;
-  color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,0.25);
-  padding-bottom: 8px;
-}
-
-/* убираем отступ у первой категории */
-.category-block:first-child .category-title {
-  margin-top: 0;
-}
-
-.card {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border-radius: 18px;
-  padding: 16px;
-  border: 1px solid rgba(255,255,255,0.25);
-  box-shadow:
-    0 8px 30px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.15);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.25s ease;
-}
-
-.card:hover {
-  transform: translateY(-6px);
-}
-
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-.card h3 {
-  margin: 14px 0 8px;
-  font-size: 18px;
-}
-
-.card p {
-  font-size: 14px;
-  flex: 1;
-}
-
-.price {
-  margin-top: 12px;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-@media (max-width: 900px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
-
-  /* на мобилках sticky отключаем — так правильнее */
-  aside {
-    position: static;
-  }
+@media(max-width:900px){
+  .main-layout{grid-template-columns:1fr}
+  aside{position:static}
 }
 </style>
 </head>
@@ -201,60 +122,115 @@ aside {
 
 <div class="main-layout">
 
-  <div class="catalog" id="catalog"></div>
+  <div id="catalog" class="catalog"></div>
 
   <aside>
     <div class="info-box">
-      <h2>Наши контакты</h2>
-      <p><strong>Dist. 8168</strong></p>
-      <p>Алекс — (520) 331-9666</p>
-      <p>Зик — (205) 195-0992</p>
-      <p>Нолан — (480) 067-5061</p>
-    </div>
+      <h2>Корзина</h2>
+      <div id="cart"></div>
+      <p><strong>Итого: <span id="total">0</span></strong></p>
 
-    <div class="info-box">
-      <h2>Заказать</h2>
-      <p>Оформите заказ онлайн</p>
-      <a class="order-btn" href="404.html" target="_blank">Заказать</a>
+      <input id="name" placeholder="ФИО">
+      <input id="phone" placeholder="Телефон">
+
+      <button class="btn" onclick="sendOrder()">Оформить заказ</button>
     </div>
   </aside>
 
 </div>
 
 <script>
-const DATA_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
+/* ===== ССЫЛКИ ===== */
+const PRODUCTS_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
+const ORDER_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 
-fetch(DATA_URL)
-  .then(res => res.json())
-  .then(items => {
-    const catalog = document.getElementById("catalog");
-    const grouped = {};
+let cart = [];
 
-    items.forEach(item => {
-      const category = item.category || "Другое";
-      if (!grouped[category]) grouped[category] = [];
-      grouped[category].push(item);
-    });
+/* ===== ЗАГРУЗКА КАТАЛОГА ===== */
+fetch(PRODUCTS_URL)
+.then(r=>r.json())
+.then(data=>{
+  const catalog=document.getElementById("catalog");
+  const groups={};
 
-    Object.keys(grouped).forEach(category => {
-      catalog.insertAdjacentHTML("beforeend", `
-        <div class="category-block">
-          <div class="category-title">${category}</div>
+  data.forEach(i=>{
+    const c=i.category||"Другое";
+    if(!groups[c])groups[c]=[];
+    groups[c].push(i);
+  });
+
+  for(const cat in groups){
+    catalog.insertAdjacentHTML("beforeend",`
+      <div class="category-title">${cat}</div>
+    `);
+
+    groups[cat].forEach(i=>{
+      catalog.insertAdjacentHTML("beforeend",`
+        <div class="card">
+          <img src="${i.image}" onerror="this.src='https://via.placeholder.com/400x250'">
+          <h3>${i.name}</h3>
+          <p>${i.description||""}</p>
+          <div class="price">${i.price} ${i.currency}</div>
+          <input type="number" min="1" value="1" class="qty" id="q-${i.name}">
+          <button class="btn" onclick='addToCart(${JSON.stringify(i)})'>В корзину</button>
         </div>
       `);
-
-      grouped[category].forEach(item => {
-        catalog.insertAdjacentHTML("beforeend", `
-          <div class="card">
-            <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
-            <h3>${item.name}</h3>
-            <p>${item.description}</p>
-            <div class="price">${item.price} ${item.currency}</div>
-          </div>
-        `);
-      });
     });
+  }
+});
+
+/* ===== КОРЗИНА ===== */
+function addToCart(item){
+  const qty=+document.getElementById("q-"+item.name).value||1;
+  const found=cart.find(i=>i.name===item.name);
+
+  if(found){
+    found.qty+=qty;
+    found.total+=qty*item.price;
+  }else{
+    cart.push({name:item.name,qty:qty,total:qty*item.price});
+  }
+  renderCart();
+}
+
+function renderCart(){
+  const box=document.getElementById("cart");
+  const totalBox=document.getElementById("total");
+  box.innerHTML="";
+  let sum=0;
+
+  cart.forEach(i=>{
+    sum+=i.total;
+    box.innerHTML+=`<p>${i.name} × ${i.qty} = ${i.total}</p>`;
   });
+
+  totalBox.textContent=sum;
+}
+
+/* ===== ОТПРАВКА ===== */
+function sendOrder(){
+  const name=document.getElementById("name").value;
+  const phone=document.getElementById("phone").value;
+
+  if(!name||!phone||cart.length===0){
+    alert("Заполните данные и добавьте товары");
+    return;
+  }
+
+  fetch(ORDER_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name,phone,items:cart})
+  })
+  .then(r=>r.json())
+  .then(r=>{
+    if(r.status==="ok"){
+      alert("Заказ отправлен!");
+      cart=[];
+      renderCart();
+    }else alert("Ошибка");
+  });
+}
 </script>
 
 </body>
