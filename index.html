@@ -8,7 +8,7 @@
 <style>
 body{
   margin:0;
-  font-family:Inter,Arial,sans-serif;
+  font-family:Arial, sans-serif;
   background:
     linear-gradient(135deg,rgba(20,20,20,.85),rgba(10,10,10,.85)),
     url("https://i.imgur.com/SCMy3Xr.jpeg");
@@ -17,7 +17,6 @@ body{
   padding:24px;
   color:#fff;
 }
-
 h1{text-align:center;margin-bottom:32px}
 
 .main-layout{
@@ -47,9 +46,6 @@ h1{text-align:center;margin-bottom:32px}
   border:1px solid rgba(255,255,255,.25);
   border-radius:18px;
   padding:16px;
-  display:flex;
-  flex-direction:column;
-  backdrop-filter:blur(16px);
 }
 
 .card img{
@@ -59,21 +55,14 @@ h1{text-align:center;margin-bottom:32px}
   border-radius:12px;
 }
 
-.card h3{margin:12px 0 6px}
-.card p{font-size:14px;flex:1}
+.price{font-size:20px;font-weight:700}
 
-.price{
-  font-size:20px;
-  font-weight:700;
-  margin-top:6px;
-}
-
-.qty{
-  margin-top:8px;
+.qty,input{
   width:100%;
-  padding:6px;
+  padding:8px;
   border-radius:8px;
   border:none;
+  margin-top:6px;
 }
 
 .btn{
@@ -85,34 +74,15 @@ h1{text-align:center;margin-bottom:32px}
   border-radius:10px;
   cursor:pointer;
   font-weight:600;
-  transition:.15s;
 }
-
-.btn:hover{background:#111}
-.btn:active{transform:scale(.96)}
+.btn:active{transform:scale(.95)}
 
 aside{position:sticky;top:24px}
-
 .info-box{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
   border-radius:18px;
   padding:18px;
-  margin-bottom:16px;
-  backdrop-filter:blur(16px);
-}
-
-input{
-  width:100%;
-  padding:8px;
-  border-radius:8px;
-  border:none;
-  margin-bottom:8px;
-}
-
-@media(max-width:900px){
-  .main-layout{grid-template-columns:1fr}
-  aside{position:static}
 }
 </style>
 </head>
@@ -123,121 +93,104 @@ input{
 
 <div class="main-layout">
 
-  <div id="catalog" class="catalog"></div>
+<div id="catalog" class="catalog"></div>
 
-  <aside>
-    <div class="info-box">
-      <h2>Корзина</h2>
-      <div id="cart"></div>
-      <p><strong>Итого: <span id="total">0</span></strong></p>
+<aside>
+  <div class="info-box">
+    <h2>Корзина</h2>
+    <div id="cart"></div>
+    <p><strong>Итого: <span id="total">0</span></strong></p>
 
-      <input id="customerName" placeholder="ФИО">
-      <input id="customerPhone" placeholder="Телефон">
+    <input id="customerName" placeholder="ФИО">
+    <input id="customerPhone" placeholder="Телефон">
 
-      <button class="btn" onclick="sendOrder()">Оформить заказ</button>
-    </div>
-  </aside>
+    <button class="btn" onclick="sendOrder()">Оформить заказ</button>
+  </div>
+</aside>
 
 </div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
-
 let cart = [];
 
-/* ===== ЗАГРУЗКА КАТАЛОГА ===== */
+/* КАТАЛОГ */
 fetch(SCRIPT_URL)
-.then(r => r.json())
-.then(items => {
-  const catalog = document.getElementById("catalog");
-  const grouped = {};
+.then(r=>r.json())
+.then(items=>{
+  const catalog=document.getElementById("catalog");
+  const groups={};
 
-  items.forEach(item => {
-    const cat = item.category || "Другое";
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(item);
+  items.forEach(i=>{
+    const c=i.category||"Другое";
+    if(!groups[c])groups[c]=[];
+    groups[c].push(i);
   });
 
-  for (const cat in grouped) {
-    catalog.insertAdjacentHTML("beforeend",
-      `<div class="category-title">${cat}</div>`
-    );
-
-    grouped[cat].forEach(item => {
-      const id = item.name.replace(/\s+/g,"_");
-
-      catalog.insertAdjacentHTML("beforeend", `
+  for(const c in groups){
+    catalog.innerHTML+=`<div class="category-title">${c}</div>`;
+    groups[c].forEach(i=>{
+      const id=i.name.replace(/\s+/g,"_");
+      catalog.innerHTML+=`
         <div class="card">
-          <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250'">
-          <h3>${item.name}</h3>
-          <p>${item.description || ""}</p>
-          <div class="price">${item.price} ${item.currency}</div>
-          <input type="number" min="1" value="1" class="qty" id="q-${id}">
+          <img src="${i.image}">
+          <h3>${i.name}</h3>
+          <p>${i.description||""}</p>
+          <div class="price">${i.price} ${i.currency}</div>
+          <input class="qty" id="q-${id}" type="number" value="1" min="1">
           <button class="btn"
-            onclick='addToCart("${item.name}", ${item.price}, document.getElementById("q-${id}").value)'>
+            onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${id}').value)">
             В корзину
           </button>
-        </div>
-      `);
+        </div>`;
     });
   }
 });
 
-/* ===== КОРЗИНА ===== */
-function addToCart(name, price, qty){
-  qty = Number(qty) || 1;
-  const found = cart.find(i => i.name === name);
-
-  if(found){
-    found.qty += qty;
-    found.total += qty * price;
-  } else {
-    cart.push({ name, qty, total: qty * price });
-  }
+/* КОРЗИНА */
+function addToCart(name,price,qty){
+  qty=Number(qty)||1;
+  const f=cart.find(i=>i.name===name);
+  if(f){f.qty+=qty;f.total+=qty*price}
+  else cart.push({name,qty,total:qty*price});
   renderCart();
 }
 
 function renderCart(){
-  const box = document.getElementById("cart");
-  const totalBox = document.getElementById("total");
-  box.innerHTML = "";
-  let sum = 0;
-
-  cart.forEach(i => {
-    sum += i.total;
-    box.innerHTML += `<p>${i.name} × ${i.qty} = ${i.total}</p>`;
+  const box=document.getElementById("cart");
+  const total=document.getElementById("total");
+  box.innerHTML="";
+  let sum=0;
+  cart.forEach(i=>{
+    sum+=i.total;
+    box.innerHTML+=`<p>${i.name} × ${i.qty} = ${i.total}</p>`;
   });
-
-  totalBox.textContent = sum;
+  total.textContent=sum;
 }
 
-/* ===== ОТПРАВКА ЗАКАЗА (КЛЮЧЕВОЙ МОМЕНТ) ===== */
+/* 🔥 ОТПРАВКА — ЕДИНСТВЕННО ВЕРНЫЙ ВАРИАНТ */
 function sendOrder(){
-  const name = document.getElementById("customerName").value.trim();
-  const phone = document.getElementById("customerPhone").value.trim();
+  if(cart.length===0)return alert("Корзина пуста");
 
-  if(!name || !phone || cart.length === 0){
-    alert("Заполните ФИО, телефон и добавьте товары");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("data", JSON.stringify({
-    name: name,
-    phone: phone,
-    items: cart
+  const params=new URLSearchParams();
+  params.append("data",JSON.stringify({
+    name:customerName.value,
+    phone:customerPhone.value,
+    items:cart
   }));
 
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: formData
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+    body:params.toString()
   });
 
-  alert("Заказ отправлен!");
-  cart = [];
+  alert("Заказ отправлен");
+  cart=[];
   renderCart();
-  document.getElementById("customerName").value = "";
-  document.getElementById("customerPhone").value = "";
+  customerName.value="";
+  customerPhone.value="";
 }
 </script>
 
