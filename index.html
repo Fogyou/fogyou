@@ -21,112 +21,40 @@ body {
   padding: 24px;
 }
 
-h1 {
-  color: #fff;
-  text-align: center;
-  margin-bottom: 32px;
-}
+h1 { color: #fff; text-align: center; margin-bottom: 32px; }
+.main-layout { max-width: 1400px; margin: auto; display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+aside { position: sticky; top: 24px; }
+.info-box { padding: 20px; background: rgba(255,255,255,0.12); backdrop-filter: blur(16px); border-radius: 18px; border: 1px solid rgba(255,255,255,0.25); color: #fff; margin-bottom: 20px; }
+.catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px; }
+.category-title { grid-column: 1 / -1; font-size: 26px; font-weight: 700; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.25); margin-top: 32px; }
+.card { background: rgba(255,255,255,0.12); border-radius: 18px; padding: 16px; color: #fff; }
+.card img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; }
+.price { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
 
-.main-layout {
-  max-width: 1400px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
-}
-
-aside {
-  position: sticky;
-  top: 24px;
-}
-
-.info-box {
-  padding: 20px;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(16px);
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-  margin-bottom: 20px;
-}
-
-.catalog {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
-  gap: 24px;
-}
-
-.category-title {
-  grid-column: 1 / -1;
-  font-size: 26px;
-  font-weight: 700;
-  color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,0.25);
-  margin-top: 32px;
-}
-
-.card {
-  background: rgba(255,255,255,0.12);
-  border-radius: 18px;
-  padding: 16px;
-  color: #fff;
-}
-
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-.price {
-  font-size: 20px;
-  font-weight: 700;
-}
-
+/* Черные кнопки с белым текстом и эффектом перелива */
 button {
   padding: 8px;
   border-radius: 8px;
   border: none;
   font-weight: 600;
   cursor: pointer;
-  background: #2ecc71;
+  background: #000;
+  color: #fff;
+  transition: background 0.3s, transform 0.2s;
+}
+button:hover {
+  background: linear-gradient(45deg, #000, #333);
+  transform: translateY(-2px);
 }
 
-.counter {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.counter { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.counter button { width: 32px; }
+.counter input { width: 60px; text-align: center; padding: 6px; border-radius: 6px; border: none; }
+.item-total { margin-top: 6px; font-weight: 600; transition: all 0.3s ease; color: #fff; }
 
-.counter button {
-  width: 32px;
-}
+input { width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 8px; border: none; }
 
-.counter input {
-  width: 60px;
-  text-align: center;
-  padding: 6px;
-  border-radius: 6px;
-  border: none;
-}
-
-input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  border: none;
-}
-
-@media (max-width: 900px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
-  aside {
-    position: static;
-  }
-}
+@media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } aside { position: static; } }
 </style>
 </head>
 
@@ -135,7 +63,6 @@ input {
 <h1>AmmuNation</h1>
 
 <div class="main-layout">
-
   <div class="catalog" id="catalog"></div>
 
   <aside>
@@ -157,11 +84,10 @@ input {
       <button style="width:100%" onclick="sendOrder()">Оформить заказ</button>
     </div>
   </aside>
-
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxWfcFrKacm4K24BACUmS40K2cUOyei6nWHKcQF5NiYO3JGE079xwe0nGsLWoXk5L7Ipw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzpU5nh65HNwJrX6t61gkvXehp0ttC2B0ESbMeOVkOGCJVO6qcR7Bgj7S_BDZ1T9Qj20Q/exec";
 
 let cart = {};
 let itemsMap = {};
@@ -169,13 +95,11 @@ let itemsMap = {};
 /* ===== ИЗМЕНЕНИЕ КОЛИЧЕСТВА ===== */
 function setQty(name, qty) {
   qty = parseInt(qty);
-  if (!qty || qty <= 0) {
-    delete cart[name];
-  } else {
-    cart[name] = qty;
-  }
+  if (!qty || qty <= 0) { delete cart[name]; } 
+  else { cart[name] = qty; }
   renderCart();
   renderButtons();
+  updateItemTotal(name);
 }
 
 function changeQty(name, delta) {
@@ -194,11 +118,24 @@ function renderCart() {
     const qty = cart[name];
     const total = qty * Number(item.price);
     sum += total;
-
     cartDiv.innerHTML += `<p>${name} × ${qty} = ${total} ${item.currency}</p>`;
   });
 
   totalSpan.textContent = sum + " $";
+}
+
+/* ===== ОБНОВЛЕНИЕ СУММЫ НА КАРТОЧКЕ С ПЛАВНОЙ АНИМАЦИЕЙ ===== */
+function updateItemTotal(name) {
+  const qty = cart[name] || 0;
+  const item = itemsMap[name];
+  const totalSpan = document.querySelector(`.card[data-name="${name}"] .item-total`);
+  if (totalSpan) {
+    totalSpan.style.opacity = 0;
+    setTimeout(() => {
+      totalSpan.textContent = qty > 0 ? `Сумма: ${qty * Number(item.price)} ${item.currency}` : '';
+      totalSpan.style.opacity = 1;
+    }, 150);
+  }
 }
 
 /* ===== КНОПКИ + ПОЛЕ ВВОДА ===== */
@@ -216,6 +153,8 @@ function renderButtons() {
           <button onclick="changeQty('${name}',1)">+</button>
         </div>
       `;
+
+    updateItemTotal(name);
   });
 }
 
@@ -237,8 +176,8 @@ function sendOrder() {
 
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ name, phone, items }),
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, phone, items })
   })
   .then(res => res.json())
   .then(() => {
@@ -270,11 +209,12 @@ fetch(API_URL)
       catalog.innerHTML += `<div class="category-title">${cat}</div>`;
       grouped[cat].forEach(item => {
         catalog.innerHTML += `
-          <div class="card">
+          <div class="card" data-name="${item.name}">
             <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
             <h3>${item.name}</h3>
             <p>${item.description || ""}</p>
             <div class="price">${item.price} ${item.currency}</div>
+            <div class="item-total"></div>
             <div data-item="${item.name}"></div>
           </div>
         `;
@@ -288,3 +228,4 @@ fetch(API_URL)
 
 </body>
 </html>
+
