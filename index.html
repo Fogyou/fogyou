@@ -20,14 +20,16 @@ body{
 
 h1{text-align:center;margin-bottom:32px}
 
+/* ===== ЛЕЙАУТ ===== */
 .main-layout{
   max-width:1400px;
   margin:auto;
   display:grid;
-  grid-template-columns:1fr 320px;
+  grid-template-columns:1fr 360px;
   gap:24px;
 }
 
+/* ===== КАТАЛОГ ===== */
 .catalog{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -58,7 +60,7 @@ h1{text-align:center;margin-bottom:32px}
 
 .price{font-size:20px;font-weight:700}
 
-/* ===== ИНПУТЫ (ЖЕЛЕЗОБЕТОН) ===== */
+/* ===== ИНПУТЫ ===== */
 input{
   width:100%;
   padding:10px;
@@ -70,16 +72,10 @@ input{
   outline:none;
   appearance:none;
   -webkit-appearance:none;
-  box-shadow:none;
 }
 
 input::placeholder{
   color:rgba(255,255,255,.7);
-}
-
-input:focus{
-  background:rgba(0,0,0,.55) !important;
-  border-color:rgba(255,255,255,.6);
 }
 
 /* ===== КНОПКИ ===== */
@@ -92,26 +88,21 @@ input:focus{
   border-radius:12px;
   cursor:pointer;
   font-weight:600;
-  transition:.15s;
 }
 
-.btn:hover{background:#111}
 .btn:active{transform:scale(.95)}
+.btn-del{background:#111;margin-left:8px}
 
-.btn-del{
-  background:#111;
-  margin-left:8px;
-}
-
-/* ===== SIDEBAR ===== */
-aside{position:relative}
-
-.sticky-box{
-  position:sticky;
+/* ===== FIXED SIDEBAR ===== */
+.sidebar{
+  position:fixed;
   top:24px;
+  right:24px;
+  width:320px;
   display:flex;
   flex-direction:column;
   gap:16px;
+  z-index:10;
 }
 
 .info-box{
@@ -123,17 +114,15 @@ aside{position:relative}
 
 .cart-item{
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  margin-bottom:6px;
+  align-items:center;
   font-size:14px;
+  margin-bottom:6px;
 }
 
-.cart-item span{flex:1}
-
-@media(max-width:900px){
+@media(max-width:1200px){
+  .sidebar{position:static;width:auto}
   .main-layout{grid-template-columns:1fr}
-  .sticky-box{position:static}
 }
 </style>
 </head>
@@ -146,30 +135,29 @@ aside{position:relative}
 
   <div id="catalog" class="catalog"></div>
 
-  <aside>
-    <div class="sticky-box">
+  <!-- FIXED SIDEBAR -->
+  <div class="sidebar">
 
-      <div class="info-box">
-        <h2>Наши контакты</h2>
-        <p><strong>Dist. 8168</strong></p>
-        <p>Алекс — (520) 331-9666</p>
-        <p>Зик — (205) 195-0992</p>
-        <p>Нолан — (480) 067-5061</p>
-      </div>
-
-      <div class="info-box">
-        <h2>Корзина</h2>
-        <div id="cart"></div>
-        <p><strong>Итого: <span id="total">0</span></strong></p>
-
-        <input id="customerName" placeholder="ФИО">
-        <input id="customerPhone" placeholder="Телефон">
-
-        <button class="btn" onclick="sendOrder()">Оформить заказ</button>
-      </div>
-
+    <div class="info-box">
+      <h2>Наши контакты</h2>
+      <p><strong>Dist. 8168</strong></p>
+      <p>Алекс — (520) 331-9666</p>
+      <p>Зик — (205) 195-0992</p>
+      <p>Нолан — (480) 067-5061</p>
     </div>
-  </aside>
+
+    <div class="info-box">
+      <h2>Корзина</h2>
+      <div id="cart"></div>
+      <p><strong>Итого: <span id="total">0</span></strong></p>
+
+      <input id="customerName" placeholder="ФИО">
+      <input id="customerPhone" placeholder="Телефон">
+
+      <button class="btn" onclick="sendOrder()">Оформить заказ</button>
+    </div>
+
+  </div>
 
 </div>
 
@@ -227,7 +215,6 @@ function renderCart(){
   const total=document.getElementById("total");
   box.innerHTML="";
   let sum=0;
-
   cart.forEach((i,idx)=>{
     sum+=i.total;
     box.innerHTML+=`
