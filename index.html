@@ -8,7 +8,7 @@
 <style>
 body{
   margin:0;
-  font-family:Arial,sans-serif;
+  font-family:Inter,Arial,sans-serif;
   background:
     linear-gradient(135deg,rgba(20,20,20,.85),rgba(10,10,10,.85)),
     url("https://i.imgur.com/SCMy3Xr.jpeg");
@@ -49,6 +49,8 @@ h1{text-align:center;margin-bottom:32px}
   border:1px solid rgba(255,255,255,.25);
   border-radius:18px;
   padding:16px;
+  display:flex;
+  flex-direction:column;
 }
 
 .card img{
@@ -58,25 +60,32 @@ h1{text-align:center;margin-bottom:32px}
   border-radius:12px;
 }
 
-.price{font-size:20px;font-weight:700}
+.price{font-size:20px;font-weight:700;margin:8px 0}
 
 /* ===== ИНПУТЫ ===== */
-input{
+.qty-input{
+  width:6ch;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(0,0,0,.45);
+  color:#fff;
+  text-align:center;
+  outline:none;
+}
+
+.text-input{
   width:100%;
   padding:10px;
   margin-top:8px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,.25);
-  background:rgba(0,0,0,.45) !important;
-  color:#fff !important;
+  background:rgba(0,0,0,.45);
+  color:#fff;
   outline:none;
-  appearance:none;
-  -webkit-appearance:none;
 }
 
-input::placeholder{
-  color:rgba(255,255,255,.7);
-}
+input::placeholder{color:rgba(255,255,255,.7)}
 
 /* ===== КНОПКИ ===== */
 .btn{
@@ -88,10 +97,11 @@ input::placeholder{
   border-radius:12px;
   cursor:pointer;
   font-weight:600;
+  transition:.15s;
 }
 
 .btn:active{transform:scale(.95)}
-.btn-del{background:#111;margin-left:8px}
+.btn-del{background:#111;padding:4px 8px}
 
 /* ===== FIXED SIDEBAR ===== */
 .sidebar{
@@ -135,7 +145,7 @@ input::placeholder{
 
   <div id="catalog" class="catalog"></div>
 
-  <!-- FIXED SIDEBAR -->
+  <!-- SIDEBAR -->
   <div class="sidebar">
 
     <div class="info-box">
@@ -151,8 +161,8 @@ input::placeholder{
       <div id="cart"></div>
       <p><strong>Итого: <span id="total">0</span></strong></p>
 
-      <input id="customerName" placeholder="ФИО">
-      <input id="customerPhone" placeholder="Телефон">
+      <input id="customerName" class="text-input" placeholder="ФИО">
+      <input id="customerPhone" class="text-input" placeholder="Телефон">
 
       <button class="btn" onclick="sendOrder()">Оформить заказ</button>
     </div>
@@ -166,7 +176,9 @@ const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1
 let cart=[];
 
 /* КАТАЛОГ */
-fetch(SCRIPT_URL).then(r=>r.json()).then(items=>{
+fetch(SCRIPT_URL)
+.then(r=>r.json())
+.then(items=>{
   const catalog=document.getElementById("catalog");
   const groups={};
 
@@ -186,7 +198,7 @@ fetch(SCRIPT_URL).then(r=>r.json()).then(items=>{
           <h3>${i.name}</h3>
           <p>${i.description||""}</p>
           <div class="price">${i.price} ${i.currency}</div>
-          <input id="q-${id}" type="number" value="1" min="1">
+          <input id="q-${id}" class="qty-input" type="number" value="1" min="1">
           <button class="btn"
             onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${id}').value)">
             В корзину
