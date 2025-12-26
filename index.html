@@ -9,8 +9,9 @@
 body{
   margin:0;
   font-family:Inter,Arial,sans-serif;
-  background:linear-gradient(135deg,rgba(20,20,20,.85),rgba(10,10,10,.85)),
-  url("https://i.imgur.com/SCMy3Xr.jpeg");
+  background:
+    linear-gradient(135deg,rgba(20,20,20,.85),rgba(10,10,10,.85)),
+    url("https://i.imgur.com/SCMy3Xr.jpeg");
   background-size:cover;
   background-attachment:fixed;
   padding:24px;
@@ -140,7 +141,6 @@ input{
 </div>
 
 <script>
-/* ===== URL СКРИПТА (ОДИН И ТОТ ЖЕ ДЛЯ GET И POST) ===== */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 
 let cart = [];
@@ -148,22 +148,22 @@ let cart = [];
 /* ===== ЗАГРУЗКА КАТАЛОГА ===== */
 fetch(SCRIPT_URL)
 .then(r => r.json())
-.then(data => {
+.then(items => {
   const catalog = document.getElementById("catalog");
-  const groups = {};
+  const grouped = {};
 
-  data.forEach(item => {
+  items.forEach(item => {
     const cat = item.category || "Другое";
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push(item);
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(item);
   });
 
-  for (const cat in groups) {
+  for (const cat in grouped) {
     catalog.insertAdjacentHTML("beforeend",
       `<div class="category-title">${cat}</div>`
     );
 
-    groups[cat].forEach(item => {
+    grouped[cat].forEach(item => {
       const id = item.name.replace(/\s+/g,"_");
 
       catalog.insertAdjacentHTML("beforeend", `
@@ -173,7 +173,8 @@ fetch(SCRIPT_URL)
           <p>${item.description || ""}</p>
           <div class="price">${item.price} ${item.currency}</div>
           <input type="number" min="1" value="1" class="qty" id="q-${id}">
-          <button class="btn" onclick='addToCart("${id}", ${item.price}, "${item.name}")'>
+          <button class="btn"
+            onclick='addToCart("${item.name}", ${item.price}, document.getElementById("q-${id}").value)'>
             В корзину
           </button>
         </div>
@@ -183,8 +184,8 @@ fetch(SCRIPT_URL)
 });
 
 /* ===== КОРЗИНА ===== */
-function addToCart(id, price, name){
-  const qty = Number(document.getElementById("q-"+id).value) || 1;
+function addToCart(name, price, qty){
+  qty = Number(qty) || 1;
   const found = cart.find(i => i.name === name);
 
   if(found){
@@ -210,7 +211,7 @@ function renderCart(){
   totalBox.textContent = sum;
 }
 
-/* ===== ОТПРАВКА ЗАКАЗА (КРИТИЧЕСКИ ВАЖНЫЙ КОД) ===== */
+/* ===== ОТПРАВКА ЗАКАЗА (КЛЮЧЕВОЙ МОМЕНТ) ===== */
 function sendOrder(){
   const name = document.getElementById("customerName").value.trim();
   const phone = document.getElementById("customerPhone").value.trim();
@@ -220,14 +221,16 @@ function sendOrder(){
     return;
   }
 
+  const formData = new FormData();
+  formData.append("data", JSON.stringify({
+    name: name,
+    phone: phone,
+    items: cart
+  }));
+
   fetch(SCRIPT_URL, {
     method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify({
-      name: name,
-      phone: phone,
-      items: cart
-    })
+    body: formData
   });
 
   alert("Заказ отправлен!");
@@ -240,4 +243,3 @@ function sendOrder(){
 
 </body>
 </html>
-
