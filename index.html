@@ -9,8 +9,6 @@
 <style>
 *{box-sizing:border-box}
 
-html{scroll-behavior:smooth}
-
 body{
   margin:0;
   font-family:Inter,Arial,sans-serif;
@@ -56,11 +54,12 @@ aside{
   grid-column:1/-1;
   font-size:26px;
   font-weight:700;
-  margin:32px 0 16px;
+  margin:40px 0 16px;
+  padding-top:10px;
   border-bottom:1px solid rgba(255,255,255,.25);
 }
 
-/* ===== КАРТОЧКА ===== */
+/* ===== КАРТОЧКИ ===== */
 .card{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
@@ -81,7 +80,7 @@ aside{
   margin:8px 0;
 }
 
-/* ===== ИНПУТЫ ===== */
+/* ===== INPUTS ===== */
 .qty-input{
   width:6ch;
   padding:6px;
@@ -104,7 +103,7 @@ aside{
 
 input::placeholder{color:rgba(255,255,255,.7)}
 
-/* ===== КНОПКИ ===== */
+/* ===== BUTTONS ===== */
 .btn{
   margin-top:10px;
   padding:10px;
@@ -135,7 +134,7 @@ input::placeholder{color:rgba(255,255,255,.7)}
   margin-bottom:6px;
 }
 
-/* ===== МЕНЮ КАТЕГОРИЙ ===== */
+/* ===== CATEGORY MENU ===== */
 .category-menu{
   display:flex;
   flex-direction:column;
@@ -149,10 +148,18 @@ input::placeholder{color:rgba(255,255,255,.7)}
   border-radius:10px;
   background:rgba(255,255,255,.08);
   font-size:14px;
+  transition:.25s;
 }
 
 .category-menu a:hover{
   background:rgba(255,255,255,.18);
+}
+
+/* АКТИВНАЯ КАТЕГОРИЯ */
+.category-menu a.active{
+  background:#fff;
+  color:#000;
+  font-weight:700;
 }
 
 /* ===== MOBILE ===== */
@@ -231,7 +238,7 @@ fetch(SCRIPT_URL)
       </div>`;
 
     menu.innerHTML+=`
-      <a href="#cat-${anchor}">${c}</a>`;
+      <a href="#" data-target="cat-${anchor}">${c}</a>`;
 
     groups[c].forEach(i=>{
       const id=i.name.replace(/\s+/g,"_");
@@ -249,7 +256,45 @@ fetch(SCRIPT_URL)
         </div>`;
     });
   }
+
+  initSmoothScroll();
+  initActiveHighlight();
 });
+
+/* ===== ПЛАВНЫЙ ПРОКАТ ===== */
+function initSmoothScroll(){
+  document.addEventListener("click",e=>{
+    const link=e.target.closest("[data-target]");
+    if(!link) return;
+
+    e.preventDefault();
+    const target=document.getElementById(link.dataset.target);
+    if(target){
+      target.scrollIntoView({behavior:"smooth",block:"start"});
+    }
+  });
+}
+
+/* ===== ПОДСВЕТКА АКТИВНОЙ КАТЕГОРИИ ===== */
+function initActiveHighlight(){
+  const sections=document.querySelectorAll(".category-title");
+  const links=[...document.querySelectorAll(".category-menu a")];
+
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove("active"));
+        const id=e.target.id;
+        const active=links.find(l=>l.dataset.target===id);
+        if(active) active.classList.add("active");
+      }
+    });
+  },{
+    rootMargin:"-40% 0px -55% 0px"
+  });
+
+  sections.forEach(s=>obs.observe(s));
+}
 
 /* ===== КОРЗИНА ===== */
 function addToCart(name,price,qty){
