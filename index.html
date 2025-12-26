@@ -38,6 +38,12 @@ h1 {
   align-items: start;
 }
 
+/* 🔒 ФИКСАЦИЯ БОКОВОЙ КОЛОНКИ */
+aside {
+  position: sticky;
+  top: 24px;
+}
+
 .info-box {
   padding: 20px 22px;
   background: rgba(255, 255, 255, 0.12);
@@ -128,7 +134,7 @@ h1 {
   padding-bottom: 8px;
 }
 
-/* 🔧 ВАЖНОЕ ИСПРАВЛЕНИЕ */
+/* убираем отступ у первой категории */
 .category-block:first-child .category-title {
   margin-top: 0;
 }
@@ -179,6 +185,11 @@ h1 {
 @media (max-width: 900px) {
   .main-layout {
     grid-template-columns: 1fr;
+  }
+
+  /* на мобилках sticky отключаем — так правильнее */
+  aside {
+    position: static;
   }
 }
 </style>
