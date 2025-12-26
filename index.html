@@ -15,18 +15,15 @@ body {
     url("https://i.imgur.com/SCMy3Xr.jpeg");
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
   background-attachment: fixed;
   min-height: 100svh;
   padding: 24px;
-  box-sizing: border-box;
 }
 
 h1 {
   color: #fff;
   text-align: center;
   margin-bottom: 32px;
-  font-weight: 600;
 }
 
 .main-layout {
@@ -35,82 +32,42 @@ h1 {
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 24px;
-  align-items: start;
 }
 
-/* 🔒 Контакты всегда на экране */
 aside {
   position: sticky;
   top: 24px;
 }
 
 .info-box {
-  padding: 20px 22px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  padding: 20px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(16px);
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.25);
-  box-shadow:
-    0 8px 30px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.15);
   color: #fff;
-}
-
-.info-box h2 {
-  margin: 0 0 12px;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.info-box p {
-  margin: 6px 0;
-  font-size: 15px;
-  line-height: 1.5;
+  margin-bottom: 20px;
 }
 
 .catalog {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
   gap: 24px;
 }
 
-.category-block {
-  grid-column: 1 / -1;
-}
-
 .category-title {
-  margin: 32px 0 16px;
+  grid-column: 1/-1;
   font-size: 26px;
-  font-weight: 700;
   color: #fff;
   border-bottom: 1px solid rgba(255,255,255,0.25);
-  padding-bottom: 8px;
-}
-
-/* первая категория на одном уровне с контактами */
-.category-block:first-child .category-title {
-  margin-top: 0;
+  margin-top: 32px;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  background: rgba(255,255,255,0.12);
   border-radius: 18px;
   padding: 16px;
-  border: 1px solid rgba(255,255,255,0.25);
-  box-shadow:
-    0 8px 30px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.15);
   color: #fff;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.25s ease;
-}
-
-.card:hover {
-  transform: translateY(-6px);
 }
 
 .card img {
@@ -120,30 +77,30 @@ aside {
   border-radius: 12px;
 }
 
-.card h3 {
-  margin: 14px 0 8px;
-  font-size: 18px;
-}
-
-.card p {
-  font-size: 14px;
-  flex: 1;
-}
-
 .price {
-  margin-top: 12px;
   font-size: 20px;
   font-weight: 700;
+  margin-top: 8px;
 }
 
-@media (max-width: 900px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
+button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #2ecc71;
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-  aside {
-    position: static;
-  }
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: none;
 }
 </style>
 </head>
@@ -158,48 +115,104 @@ aside {
 
   <aside>
     <div class="info-box">
-      <h2>Наши контакты</h2>
-      <p><strong>Dist. 8168</strong></p>
+      <h2>Контакты</h2>
       <p>Алекс — (520) 331-9666</p>
       <p>Зик — (205) 195-0992</p>
       <p>Нолан — (480) 067-5061</p>
+    </div>
+
+    <div class="info-box">
+      <h2>Корзина</h2>
+      <div id="cart"></div>
+      <p><strong>Итого: <span id="total">0</span> $</strong></p>
+
+      <input id="fio" placeholder="ФИО">
+      <input id="phone" placeholder="Телефон">
+
+      <button onclick="sendOrder()">Оформить заказ</button>
     </div>
   </aside>
 
 </div>
 
 <script>
-const DATA_URL = "https://script.google.com/macros/s/AKfycbwSoho1_PYwCEJMqzwKhBj6BcxDhYhWtvkIqJ5EMpZeL-0rqJcHrPFz8lmblYzwhFGn/exec";
+const DATA_URL = "https://script.google.com/macros/s/AKfycbw3x3geMMWEFNIPqPi1hX1pUwdD3bSyWfXwC4I7W8AfI4kk3Uf_YkqcRQfxRqIKohlpwg/exec";
+const ORDER_URL = DATA_URL;
+
+let cart = [];
+
+function addToCart(item) {
+  const found = cart.find(i => i.name === item.name);
+  if (found) {
+    found.qty++;
+    found.total += item.price;
+  } else {
+    cart.push({
+      name: item.name,
+      qty: 1,
+      price: item.price,
+      total: item.price
+    });
+  }
+  renderCart();
+}
+
+function renderCart() {
+  const cartDiv = document.getElementById("cart");
+  const totalSpan = document.getElementById("total");
+  cartDiv.innerHTML = "";
+  let sum = 0;
+
+  cart.forEach(item => {
+    sum += item.total;
+    cartDiv.innerHTML += `<p>${item.name} × ${item.qty} = ${item.total}$</p>`;
+  });
+
+  totalSpan.textContent = sum;
+}
+
+function sendOrder() {
+  const name = fio.value.trim();
+  const phone = phone.value.trim();
+
+  if (!name || !phone || cart.length === 0) {
+    alert("Заполни данные и добавь товар");
+    return;
+  }
+
+  fetch(ORDER_URL, {
+    method: "POST",
+    body: JSON.stringify({ name, phone, items: cart })
+  }).then(() => {
+    alert("Заказ отправлен!");
+    cart = [];
+    renderCart();
+    fio.value = "";
+    phone.value = "";
+  });
+}
 
 fetch(DATA_URL)
   .then(res => res.json())
   .then(items => {
     const catalog = document.getElementById("catalog");
-    const grouped = {};
+    let currentCategory = "";
 
     items.forEach(item => {
-      const category = item.category || "Другое";
-      if (!grouped[category]) grouped[category] = [];
-      grouped[category].push(item);
-    });
+      if (item.category !== currentCategory) {
+        currentCategory = item.category;
+        catalog.innerHTML += `<div class="category-title">${currentCategory}</div>`;
+      }
 
-    Object.keys(grouped).forEach(category => {
-      catalog.insertAdjacentHTML("beforeend", `
-        <div class="category-block">
-          <div class="category-title">${category}</div>
+      catalog.innerHTML += `
+        <div class="card">
+          <img src="${item.image}">
+          <h3>${item.name}</h3>
+          <p>${item.description}</p>
+          <div class="price">${item.price} ${item.currency}</div>
+          <button onclick='addToCart(${JSON.stringify(item)})'>В корзину</button>
         </div>
-      `);
-
-      grouped[category].forEach(item => {
-        catalog.insertAdjacentHTML("beforeend", `
-          <div class="card">
-            <img src="${item.image}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
-            <h3>${item.name}</h3>
-            <p>${item.description}</p>
-            <div class="price">${item.price} ${item.currency}</div>
-          </div>
-        `);
-      });
+      `;
     });
   });
 </script>
