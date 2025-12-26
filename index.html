@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AmmuNation</title>
 
+<!-- ✅ FAVICON -->
+<link rel="icon" type="image/png" href="favicon.png">
+
 <style>
 body {
   margin: 0;
@@ -35,7 +38,6 @@ h1 {
 aside {
   position: sticky;
   top: 24px;
-  align-self: start;
 }
 
 .info-box {
@@ -57,6 +59,7 @@ aside {
 .category-title {
   grid-column: 1 / -1;
   font-size: 26px;
+  font-weight: 700;
   color: #fff;
   border-bottom: 1px solid rgba(255,255,255,0.25);
   margin-top: 32px;
@@ -82,9 +85,8 @@ aside {
 }
 
 button {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 8px;
+  border-radius: 8px;
   border: none;
   font-weight: 600;
   cursor: pointer;
@@ -94,12 +96,19 @@ button {
 .counter {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 6px;
 }
 
 .counter button {
-  width: 32%;
-  font-size: 18px;
+  width: 32px;
+}
+
+.counter input {
+  width: 60px;
+  text-align: center;
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
 }
 
 input {
@@ -136,30 +145,35 @@ input {
       <input id="fio" placeholder="ФИО">
       <input id="phone" placeholder="Телефон">
 
-      <button onclick="sendOrder()">Оформить заказ</button>
+      <button style="width:100%" onclick="sendOrder()">Оформить заказ</button>
     </div>
   </aside>
 
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbze4o5v2u8ZIi4NQU8UHb9B7miE_CC3TLr9AGPP3yIDvo8g1mQPExljv0fu65UzBfZBsg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz1HPj0b219U46qvc86RRjHkxx8cpRTqR5cPAiPe6eLJpzmu1k7gg6NOTRlxcGWOWO1rw/exec";
 
 let cart = {};
 let itemsMap = {};
 
-/* ===== КОРЗИНА ===== */
-function changeQty(name, delta) {
-  if (!cart[name]) cart[name] = 0;
-  cart[name] += delta;
-
-  if (cart[name] <= 0) {
+/* ===== ИЗМЕНЕНИЕ КОЛИЧЕСТВА ===== */
+function setQty(name, qty) {
+  qty = parseInt(qty);
+  if (!qty || qty <= 0) {
     delete cart[name];
+  } else {
+    cart[name] = qty;
   }
   renderCart();
   renderButtons();
 }
 
+function changeQty(name, delta) {
+  setQty(name, (cart[name] || 0) + delta);
+}
+
+/* ===== КОРЗИНА ===== */
 function renderCart() {
   const cartDiv = document.getElementById("cart");
   const totalSpan = document.getElementById("total");
@@ -172,29 +186,30 @@ function renderCart() {
     const total = qty * Number(item.price);
     sum += total;
 
-    cartDiv.innerHTML += `<p>${name} × ${qty} = ${total} ${item.currency}</p>`;
+    cartDiv.innerHTML += `
+      <p>${name} × ${qty} = ${total} ${item.currency}</p>
+    `;
   });
 
   totalSpan.textContent = sum + " $";
 }
 
-/* ===== КНОПКИ В КАРТОЧКАХ ===== */
+/* ===== КНОПКИ + ПОЛЕ ВВОДА ===== */
 function renderButtons() {
   document.querySelectorAll("[data-item]").forEach(el => {
     const name = el.dataset.item;
     const qty = cart[name] || 0;
 
-    if (qty === 0) {
-      el.innerHTML = `<button onclick="changeQty('${name}',1)">В корзину</button>`;
-    } else {
-      el.innerHTML = `
+    el.innerHTML = qty === 0
+      ? `<button onclick="setQty('${name}',1)">В корзину</button>`
+      : `
         <div class="counter">
           <button onclick="changeQty('${name}',-1)">−</button>
-          <strong>${qty}</strong>
+          <input type="number" min="0" value="${qty}"
+            onchange="setQty('${name}', this.value)">
           <button onclick="changeQty('${name}',1)">+</button>
         </div>
       `;
-    }
   });
 }
 
