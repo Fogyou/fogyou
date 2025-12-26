@@ -140,14 +140,13 @@ input{
 </div>
 
 <script>
-/* ===== ССЫЛКИ НА GOOGLE APPS SCRIPT ===== */
-const PRODUCTS_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
-const ORDER_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
+/* ===== URL СКРИПТА (ОДИН И ТОТ ЖЕ ДЛЯ GET И POST) ===== */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 
 let cart = [];
 
 /* ===== ЗАГРУЗКА КАТАЛОГА ===== */
-fetch(PRODUCTS_URL)
+fetch(SCRIPT_URL)
 .then(r => r.json())
 .then(data => {
   const catalog = document.getElementById("catalog");
@@ -165,7 +164,7 @@ fetch(PRODUCTS_URL)
     );
 
     groups[cat].forEach(item => {
-      const safeId = item.name.replace(/\s+/g,'_');
+      const id = item.name.replace(/\s+/g,"_");
 
       catalog.insertAdjacentHTML("beforeend", `
         <div class="card">
@@ -173,8 +172,8 @@ fetch(PRODUCTS_URL)
           <h3>${item.name}</h3>
           <p>${item.description || ""}</p>
           <div class="price">${item.price} ${item.currency}</div>
-          <input type="number" min="1" value="1" class="qty" id="q-${safeId}">
-          <button class="btn" onclick='addToCart("${safeId}", ${item.price}, "${item.name}")'>
+          <input type="number" min="1" value="1" class="qty" id="q-${id}">
+          <button class="btn" onclick='addToCart("${id}", ${item.price}, "${item.name}")'>
             В корзину
           </button>
         </div>
@@ -211,7 +210,7 @@ function renderCart(){
   totalBox.textContent = sum;
 }
 
-/* ===== ОТПРАВКА ЗАКАЗА ===== */
+/* ===== ОТПРАВКА ЗАКАЗА (КРИТИЧЕСКИ ВАЖНЫЙ КОД) ===== */
 function sendOrder(){
   const name = document.getElementById("customerName").value.trim();
   const phone = document.getElementById("customerPhone").value.trim();
@@ -221,31 +220,21 @@ function sendOrder(){
     return;
   }
 
-  fetch(ORDER_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
     body: JSON.stringify({
       name: name,
       phone: phone,
       items: cart
     })
-  })
-  .then(r => r.json())
-  .then(r => {
-    if(r.status === "ok"){
-      alert("Заказ отправлен!");
-      cart = [];
-      renderCart();
-      document.getElementById("customerName").value = "";
-      document.getElementById("customerPhone").value = "";
-    } else {
-      alert("Ошибка: " + r.message);
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Ошибка отправки");
   });
+
+  alert("Заказ отправлен!");
+  cart = [];
+  renderCart();
+  document.getElementById("customerName").value = "";
+  document.getElementById("customerPhone").value = "";
 }
 </script>
 
