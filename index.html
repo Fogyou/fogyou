@@ -107,7 +107,7 @@ aside{
 
 input::placeholder{color:rgba(255,255,255,.7)}
 
-/* ===== КНОПКИ — ОРИГИНАЛ ===== */
+/* ===== КНОПКИ ===== */
 .btn{
   margin-top:10px;
   padding:10px;
@@ -130,12 +130,29 @@ input::placeholder{color:rgba(255,255,255,.7)}
   padding:18px;
 }
 
-.cart-item{
+/* ===== COLLAPSIBLE ===== */
+details summary{
+  cursor:pointer;
+  list-style:none;
+}
+
+details summary::-webkit-details-marker{display:none}
+
+details summary h2{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  font-size:14px;
-  margin-bottom:6px;
+  margin:0;
+}
+
+details summary h2::after{
+  content:"▾";
+  font-size:18px;
+  transition:.25s;
+}
+
+details:not([open]) summary h2::after{
+  transform:rotate(-90deg);
 }
 
 /* ===== МЕНЮ КАТЕГОРИЙ ===== */
@@ -143,6 +160,7 @@ input::placeholder{color:rgba(255,255,255,.7)}
   display:flex;
   flex-direction:column;
   gap:8px;
+  margin-top:10px;
 }
 
 .category-menu a{
@@ -178,19 +196,22 @@ input::placeholder{color:rgba(255,255,255,.7)}
 
   <aside>
 
-    <div class="info-box">
-      <h2>Наши контакты</h2>
+    <!-- НАШИ КОНТАКТЫ -->
+    <details open class="info-box">
+      <summary><h2>Наши контакты</h2></summary>
       <p><strong>Dist. 8168</strong></p>
       <p>Алекс — (520) 331-9666</p>
       <p>Зик — (205) 195-0992</p>
       <p>Нолан — (480) 067-5061</p>
-    </div>
+    </details>
 
-    <div class="info-box">
-      <h2>Категории</h2>
+    <!-- КАТЕГОРИИ -->
+    <details open class="info-box">
+      <summary><h2>Категории</h2></summary>
       <nav id="categoryMenu" class="category-menu"></nav>
-    </div>
+    </details>
 
+    <!-- КОРЗИНА -->
     <div class="info-box">
       <h2>Корзина</h2>
       <div id="cart"></div>
@@ -206,6 +227,7 @@ input::placeholder{color:rgba(255,255,255,.7)}
 
 </div>
 
+<!-- JS — БЕЗ ИЗМЕНЕНИЙ -->
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 let cart=[];
@@ -251,7 +273,7 @@ fetch(SCRIPT_URL)
   initScrollSpy();
 });
 
-/* ===== ПЛАВНЫЙ СКРОЛЛ ===== */
+/* ===== СКРОЛЛ ===== */
 document.addEventListener("click",e=>{
   const link=e.target.closest("[data-target]");
   if(!link) return;
@@ -260,7 +282,6 @@ document.addEventListener("click",e=>{
     .scrollIntoView({behavior:"smooth",block:"start"});
 });
 
-/* ===== ПОДСВЕТКА (БЕЗ ПРОПУСКОВ) ===== */
 function initScrollSpy(){
   const sections=[...document.querySelectorAll(".category-title")];
   const links=[...document.querySelectorAll(".category-menu a")];
@@ -279,7 +300,7 @@ function initScrollSpy(){
   window.dispatchEvent(new Event("scroll"));
 }
 
-/* ===== КОРЗИНА — ОРИГИНАЛ ===== */
+/* ===== КОРЗИНА ===== */
 function addToCart(name,price,qty){
   qty=+qty||1;
   const f=cart.find(i=>i.name===name);
@@ -309,7 +330,6 @@ function renderCart(){
   total.textContent=sum;
 }
 
-/* ===== ОТПРАВКА — ОРИГИНАЛ ===== */
 function sendOrder(){
   if(!cart.length)return alert("Корзина пуста");
 
@@ -337,4 +357,3 @@ function sendOrder(){
 
 </body>
 </html>
-
