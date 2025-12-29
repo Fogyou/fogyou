@@ -24,7 +24,6 @@ body{
 
 h1{text-align:center;margin-bottom:32px}
 
-
 .main-layout{
   max-width:1400px;
   margin:auto;
@@ -34,7 +33,6 @@ h1{text-align:center;margin-bottom:32px}
   align-items:start;
 }
 
-
 aside{
   position:sticky;
   top:24px;
@@ -42,7 +40,6 @@ aside{
   flex-direction:column;
   gap:16px;
 }
-
 
 .catalog{
   display:grid;
@@ -57,7 +54,6 @@ aside{
   margin:32px 0 16px;
   border-bottom:1px solid rgba(255,255,255,.25);
 }
-
 
 .card{
   background:rgba(255,255,255,.12);
@@ -79,57 +75,12 @@ aside{
   margin:8px 0;
 }
 
-
-.qty-input{
-  width:100%;
-  max-width:90px;
-  padding:8px;
-  margin-top:6px;
-  text-align:center;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.25);
-  background:rgba(0,0,0,.45);
-  color:#fff;
-  outline:none;
-  font-size:15px;
-}
-
-.text-input{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.25);
-  background:rgba(0,0,0,.45);
-  color:#fff;
-  outline:none;
-}
-
-input::placeholder{color:rgba(255,255,255,.7)}
-
-/* ===== КНОПКИ ===== */
-.btn{
-  margin-top:10px;
-  padding:10px;
-  background:#000;
-  color:#fff;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:600;
-}
-
-.btn:active{transform:scale(.95)}
-.btn-del{background:#111;padding:4px 8px}
-
-
 .info-box{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
   border-radius:18px;
   padding:18px;
 }
-
 
 details summary{
   cursor:pointer;
@@ -155,7 +106,6 @@ details:not([open]) summary h2::after{
   transform:rotate(-90deg);
 }
 
-
 .category-menu{
   display:flex;
   flex-direction:column;
@@ -178,7 +128,6 @@ details:not([open]) summary h2::after{
   font-weight:700;
 }
 
-
 @media(max-width:900px){
   .main-layout{grid-template-columns:1fr}
   aside{position:static}
@@ -195,8 +144,6 @@ details:not([open]) summary h2::after{
   <div id="catalog" class="catalog"></div>
 
   <aside>
-
-    
     <details open class="info-box">
       <summary><h2>Наши контакты</h2></summary>
       <p><strong>Dist. 8168</strong></p>
@@ -205,21 +152,16 @@ details:not([open]) summary h2::after{
       <p>Нолан — (480) 067-5061</p>
     </details>
 
-
     <details open class="info-box">
       <summary><h2>Категории</h2></summary>
       <nav id="categoryMenu" class="category-menu"></nav>
     </details>
-
   </aside>
 
 </div>
 
-
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
-let cart=[];
-
 
 fetch(SCRIPT_URL)
 .then(r=>r.json())
@@ -243,24 +185,18 @@ fetch(SCRIPT_URL)
       <a href="#" data-target="cat-${anchor}">${c}</a>`;
 
     groups[c].forEach(i=>{
-      const id=i.name.replace(/\s+/g,"_");
       catalog.innerHTML+=`
         <div class="card">
           <img src="${i.image}">
           <h3>${i.name}</h3>
           <p>${i.description||""}</p>
           <div class="price">${i.price} ${i.currency}</div>
-          <input id="q-${id}" class="qty-input" type="number" value="1" min="1">
-          <button class="btn"
-            onclick="addToCart('${i.name}',${i.price},document.getElementById('q-${id}').value)">
-            В корзину
-          </button>`;
+        </div>`;
     });
   }
 
   initScrollSpy();
 });
-
 
 document.addEventListener("click",e=>{
   const link=e.target.closest("[data-target]");
@@ -287,11 +223,7 @@ function initScrollSpy(){
 
   window.dispatchEvent(new Event("scroll"));
 }
-
-
-
 </script>
 
 </body>
 </html>
-
