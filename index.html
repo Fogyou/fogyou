@@ -24,7 +24,7 @@ body{
 
 h1{text-align:center;margin-bottom:32px}
 
-/* ===== ЛЕЙАУТ ===== */
+
 .main-layout{
   max-width:1400px;
   margin:auto;
@@ -34,7 +34,7 @@ h1{text-align:center;margin-bottom:32px}
   align-items:start;
 }
 
-/* ===== STICKY SIDEBAR ===== */
+
 aside{
   position:sticky;
   top:24px;
@@ -43,7 +43,7 @@ aside{
   gap:16px;
 }
 
-/* ===== КАТАЛОГ ===== */
+
 .catalog{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -58,7 +58,7 @@ aside{
   border-bottom:1px solid rgba(255,255,255,.25);
 }
 
-/* ===== КАРТОЧКА ===== */
+
 .card{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
@@ -79,7 +79,7 @@ aside{
   margin:8px 0;
 }
 
-/* ===== ИНПУТЫ ===== */
+
 .qty-input{
   width:100%;
   max-width:90px;
@@ -122,7 +122,7 @@ input::placeholder{color:rgba(255,255,255,.7)}
 .btn:active{transform:scale(.95)}
 .btn-del{background:#111;padding:4px 8px}
 
-/* ===== BOX ===== */
+
 .info-box{
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.25);
@@ -130,7 +130,7 @@ input::placeholder{color:rgba(255,255,255,.7)}
   padding:18px;
 }
 
-/* ===== COLLAPSIBLE ===== */
+
 details summary{
   cursor:pointer;
   list-style:none;
@@ -155,7 +155,7 @@ details:not([open]) summary h2::after{
   transform:rotate(-90deg);
 }
 
-/* ===== МЕНЮ КАТЕГОРИЙ ===== */
+
 .category-menu{
   display:flex;
   flex-direction:column;
@@ -178,7 +178,7 @@ details:not([open]) summary h2::after{
   font-weight:700;
 }
 
-/* ===== MOBILE ===== */
+
 @media(max-width:900px){
   .main-layout{grid-template-columns:1fr}
   aside{position:static}
@@ -196,7 +196,7 @@ details:not([open]) summary h2::after{
 
   <aside>
 
-    <!-- НАШИ КОНТАКТЫ -->
+    
     <details open class="info-box">
       <summary><h2>Наши контакты</h2></summary>
       <p><strong>Dist. 8168</strong></p>
@@ -205,7 +205,7 @@ details:not([open]) summary h2::after{
       <p>Нолан — (480) 067-5061</p>
     </details>
 
-    <!-- КАТЕГОРИИ -->
+
     <details open class="info-box">
       <summary><h2>Категории</h2></summary>
       <nav id="categoryMenu" class="category-menu"></nav>
@@ -215,12 +215,12 @@ details:not([open]) summary h2::after{
 
 </div>
 
-<!-- JS — БЕЗ ИЗМЕНЕНИЙ -->
+
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx1jZJ-P6ijI7E6m6HSux1P9PNbFDOFmkzojLlgU45wo5CAmJnsGU-KEqw8th8mCZRT/exec";
 let cart=[];
 
-/* ===== КАТАЛОГ + МЕНЮ ===== */
+
 fetch(SCRIPT_URL)
 .then(r=>r.json())
 .then(items=>{
@@ -261,7 +261,7 @@ fetch(SCRIPT_URL)
   initScrollSpy();
 });
 
-/* ===== СКРОЛЛ ===== */
+
 document.addEventListener("click",e=>{
   const link=e.target.closest("[data-target]");
   if(!link) return;
@@ -288,12 +288,10 @@ function initScrollSpy(){
   window.dispatchEvent(new Event("scroll"));
 }
 
-/* ===== КОРЗИНА (логика сохранена) ===== */
-function addToCart(name,price,qty){}
-function removeFromCart(i){}
-function renderCart(){}
-function sendOrder(){}
+
+
 </script>
 
 </body>
 </html>
+
